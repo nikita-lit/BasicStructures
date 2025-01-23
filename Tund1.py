@@ -51,7 +51,7 @@ print("Laua peal on jäänud", kommide_arv - mitu)
 # 4.
 
 pikkus = float(input("Puu ümbermõõdu pikkus: "))
-d = pikkus / pi
+d = round( pikkus / pi, 3 )
 print("Puu läbimõõdu =", d)
 
 # --------------------------------------
@@ -60,7 +60,7 @@ print("Puu läbimõõdu =", d)
 N = float(input("Esimene külg: "))
 M = float(input("Teine külg: "))
 
-diagonaal = sqrt(N**2 + M**2)
+diagonaal = round( sqrt(N**2 + M**2), 3 )
 
 print("Diagonaali pikkus on =", diagonaal)
 
