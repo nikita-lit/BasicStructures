@@ -1,8 +1,13 @@
 ﻿# --------------------------------------
+
+from math import *
+from random import *
+
+# --------------------------------------
 # 1.
 
 print("Tere, maailm!")
-nimi = input("Nimi: ")
+nimi = input("Nimi: ").capitalize()
 print("Tere, maailm! Tervitan sind", nimi+".")
 vanus = int(input("Vanus: "))
 print("Tere, maailm! Tervitan sind", nimi+"!", "Sa oled", str(vanus), "aastat vana.")
@@ -26,42 +31,36 @@ eesnimi = "Jaak"
 pikkus = 16.5
 kas_käib_koolis = True
 
-print("vanus -", type(vanus))
-print("eesnimi -",type(eesnimi))
-print("pikkus -",type(pikkus))
-print("kas_käib_koolis -",type(kas_käib_koolis))
+print("vanus", vanus, "on", type(vanus))
+print("eesnimi", eesnimi, "on", type(eesnimi))
+print("pikkus", pikkus, "on", type(pikkus))
+print("kas_käib_koolis", kas_käib_koolis, "on", type(kas_käib_koolis))
 
 # --------------------------------------
 # 3.
 
-kommide_arv = 5
-print(kommide_arv, "kommi laual.")
+kommide_arv = randint(10, 100)
+print("Laua peal on", kommide_arv)
 
 print("Mitu kommi sa soovid laualt ära võtta?")
-arv = int(input("Arv: "))
+mitu = int(input("Mitu tahad süüja? "))
 
-kommide_arv -= arv
-if kommide_arv < 0:
-    kommide_arv = 0
-
-print(kommide_arv, "kommi laual nüüd on.")
+print("Laua peal on jäänud", kommide_arv - mitu)
 
 # --------------------------------------
 # 4.
 
 pikkus = float(input("Puu ümbermõõdu pikkus: "))
-d = pikkus / 3.14
+d = pikkus / pi
 print("Puu läbimõõdu =", d)
 
 # --------------------------------------
 # 5.
 
-import math
-
 N = float(input("Esimene külg: "))
 M = float(input("Teine külg: "))
 
-diagonaal = math.sqrt(N**2 + M**2)
+diagonaal = sqrt(N**2 + M**2)
 
 print("Diagonaali pikkus on =", diagonaal)
 
@@ -121,6 +120,4 @@ kogu_summa = pitsa_hind + jootraha
 print("Pitsa kogu summa = ", kogu_summa)
 
 inimesi = int(input("Kui palju inimesi on? "))
-summa_iga_üks = kogu_summa / inimesi
-
-print("Igaüks peab maksma:", summa_iga_üks,"€")
+print("Igaüks peab maksma:", kogu_summa / inimesi,"€")
