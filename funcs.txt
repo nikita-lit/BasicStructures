@@ -5,6 +5,8 @@ int()
 float()
 str()
 
+input()
+
 # --------------------------------------
 
 .upper()
@@ -25,10 +27,10 @@ from datetime import *
 date.today()
 date()
 .strftime()
-	.strftime("%d/%m/%Y")
-	.strftime("%B %d, %Y")
-	.strftime("%m/%d/%y")
-	.strftime("%b-%d-%Y")
+	.strftime("%d/%m/%Y") 27/12/2022
+	.strftime("%B %d, %Y") December 27, 2022
+	.strftime("%m/%d/%y") 12/27/22
+	.strftime("%b-%d-%Y") Dec-27-2022
 
 date.day
 date.month
