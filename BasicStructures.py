@@ -7,7 +7,7 @@ print("Tere tulemast! 1", "Tere tulemast! 2", end="...\n", sep="----")
 # täisarv - int
 # ujukomaarv - float
 # sõne - str
-# tõevärtused - bool
+# tõeväärtused - bool
 # -------------------------------------
 # Astendamine ( ** )
 

@@ -173,14 +173,17 @@ print("kill koll koll ja kill koll kill.".upper())
 print("\n------- Ülesanne 7 -------\n")
 
 try:
-    pikkus = float(input("Sisesta ristküliku pikkus: "))
-    laius = float(input("Sisesta ristküliku laius: "))
+    a = float(input("A: "))
+    b = float(input("B: "))
 
-    ümbermõõt = 2 * (pikkus + laius)
-    pindala = pikkus * laius
+    if a > 0 and b > 0:
+        print("Pindala ja ümbermõõdu arvutamine: ")
+        S = a*b
+        P = (a+b)*2
+        print(f"S = {S}, P = {P}")
+    else:
+        print("Arvud peaval suurem kui 0 olla!")
 
-    print(f"Ristküliku ümbermõõt on {round(ümbermõõt, 2)}")
-    print(f"Ristküliku pindala on {round(pindala, 2)}")
 except:
     print("VIGA! Vale sisse andmed.")
 
