@@ -169,18 +169,56 @@ print("kill koll koll ja kill koll kill.".upper())
 # 7.
 print("\n------- Ülesanne 7 -------\n")
 
-pikkus = float(input("Sisesta ristküliku pikkus: "))
-laius = float(input("Sisesta ristküliku laius: "))
+try:
+    pikkus = float(input("Sisesta ristküliku pikkus: "))
+    laius = float(input("Sisesta ristküliku laius: "))
 
-ümbermõõt = 2 * (pikkus + laius)
-pindala = pikkus * laius
+    ümbermõõt = 2 * (pikkus + laius)
+    pindala = pikkus * laius
 
-print(f"Ristküliku ümbermõõt on {round(ümbermõõt, 2)}")
-print(f"Ristküliku pindala on {round(pindala, 2)}")
+    print(f"Ristküliku ümbermõõt on {round(ümbermõõt, 2)}")
+    print(f"Ristküliku pindala on {round(pindala, 2)}")
+except:
+    print("VIGA! Vale sisse andmed.")
 
 # --------------------------------------
 # 8.
 print("\n------- Ülesanne 8 -------\n")
 
-liitrid = float(input("Sisesta tangitud kütuse liitrid: "))
-kilomeetrid = float(input("Sisesta läbitud kilomeetrid: "))
+try:
+    liitrid = float(input("Sisesta tangitud kütuse liitrid: "))
+    kilomeetrid = float(input("Sisesta läbitud kilomeetrid: "))
+
+    kütusekulu = (liitrid / kilomeetrid) * 100
+    print(f"Keskmine kütusekulu 100 km kohta on {kütusekulu}")
+except:
+    print("VIGA! Vale sisse andmed.")
+
+# --------------------------------------
+# 9.
+print("\n------- Ülesanne 9 -------\n")
+
+kiirus = 29.9
+
+try:
+    M = int(input("Sisesta aeg minutites: "))
+
+    aeg = M / 60 # tundiseks
+    kaugus = kiirus * aeg
+
+    print(f"Kaugus {M} minutiga on {round(kaugus, 2)} km.")
+except:
+    print("VIGA! Vale sisse andmed.")
+
+# --------------------------------------
+# 10.
+print("\n------- Ülesanne 10 -------\n")
+
+try:
+    M = int(input("Sisesta aeg minutites: "))
+    tund = M // 60
+    minutites = M % 60
+
+    print(f"Minutites tunniseks ja minutiseks on {tund}:{minutites}")
+except:
+    print("VIGA! Vale sisse andmed.")
