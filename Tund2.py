@@ -235,6 +235,6 @@ try:
         tund = M // 60
         minutites = M % 60
 
-        print(f"Minutites tunniseks ja minutiseks on {tund}:{minutites}")
+        print(f"Minutites tunniseks ja minutiseks on {tund}:{minutites:02}")
 except:
     print("VIGA! Vale sisendandmed.")
