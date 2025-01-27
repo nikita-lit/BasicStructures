@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>06b023c2-f9e7-43ca-8925-678430473a32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Tund2.py</StartupFile>
+    <StartupFile>IseseisevTöö1.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BasicStructures.py" />
+    <Compile Include="IseseisevTöö1.py" />
     <Compile Include="Tund1.py" />
     <Compile Include="Tund2.py" />
   </ItemGroup>
