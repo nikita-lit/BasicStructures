@@ -1,0 +1,43 @@
+# --------------------------------------
+
+type()
+int()
+float()
+str()
+
+# --------------------------------------
+
+.upper()
+.lower()
+.capitalize()
+
+# --------------------------------------
+from math import *
+
+pi
+sqrt()
+round(num1, num2)
+	round(25.43634, 2) -> 25.44
+
+# --------------------------------------
+from datetime import *
+
+date.today()
+date()
+.strftime()
+	.strftime("%d/%m/%Y")
+	.strftime("%B %d, %Y")
+	.strftime("%m/%d/%y")
+	.strftime("%b-%d-%Y")
+
+date.day
+date.month
+date.year
+
+# --------------------------------------
+from calendar import *
+
+monthrange(year, month)[0]
+monthrange(year, month)[1]
+
+# --------------------------------------
