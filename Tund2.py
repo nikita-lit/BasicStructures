@@ -147,7 +147,7 @@ print("\n------- Ülesanne 5 -------\n")
 sõna1 = "kill-koll ".capitalize()
 sõna2 = "killadi-koll ".capitalize()
 
-print(sõna1 * 2 + sõna2 + sõna1 * 2 + sõna2 + sõna1 * 4)
+print(sõna1 * 2 + sõna2 + sõna1 * 2 + sõna2 + sõna1 * 3 +"\n"+sõna1)
 
 # --------------------------------------
 # 6.
