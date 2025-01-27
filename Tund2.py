@@ -185,7 +185,7 @@ try:
         print("Arvud peaval suurem kui 0 olla!")
 
 except:
-    print("VIGA! Vale sisse andmed.")
+    print("VIGA! Vale sisendandmed.")
 
 # --------------------------------------
 # 8.
@@ -195,10 +195,14 @@ try:
     liitrid = float(input("Sisesta tangitud kütuse liitrid: "))
     kilomeetrid = float(input("Sisesta läbitud kilomeetrid: "))
 
-    kütusekulu = (liitrid / kilomeetrid) * 100
-    print(f"Keskmine kütusekulu 100 km kohta on {kütusekulu}")
+    if liitrid >= 0 and kilomeetrid > 0:
+        kütusekulu = (liitrid / kilomeetrid) * 100
+
+        print(f"Keskmine kütusekulu 100 km kohta on {kütusekulu}")
+    else:
+        print("VIGA! Vale sisendandmed.")
 except:
-    print("VIGA! Vale sisse andmed.")
+    print("VIGA! Vale sisendandmed.")
 
 # --------------------------------------
 # 9.
@@ -209,12 +213,17 @@ kiirus = 29.9
 try:
     M = int(input("Sisesta aeg minutites: "))
 
-    aeg = M / 60 # tundiseks
-    kaugus = kiirus * aeg
+    if M >= 0:
+        aeg = M / 60 # tundiseks
+        kaugus = kiirus * aeg
 
-    print(f"Kaugus {M} minutiga on {round(kaugus, 2)} km.")
+        print(f"Kiirus on {kiirus}")
+        print(f"Kaugus {M} minutiga on {round(kaugus, 2)} km.")
+    else:
+        print("VIGA! Vale sisendandmed.")
+
 except:
-    print("VIGA! Vale sisse andmed.")
+    print("VIGA! Vale sisendandmed.")
 
 # --------------------------------------
 # 10.
@@ -222,9 +231,10 @@ print("\n------- Ülesanne 10 -------\n")
 
 try:
     M = int(input("Sisesta aeg minutites: "))
-    tund = M // 60
-    minutites = M % 60
+    if M >= 0:
+        tund = M // 60
+        minutites = M % 60
 
-    print(f"Minutites tunniseks ja minutiseks on {tund}:{minutites}")
+        print(f"Minutites tunniseks ja minutiseks on {tund}:{minutites}")
 except:
-    print("VIGA! Vale sisse andmed.")
+    print("VIGA! Vale sisendandmed.")
