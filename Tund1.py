@@ -1,4 +1,6 @@
 ﻿# --------------------------------------
+# Tund 1 "Funktsioonide print(),input(), float(), int() kasutamine"
+# --------------------------------------
 
 from math import *
 from random import *
