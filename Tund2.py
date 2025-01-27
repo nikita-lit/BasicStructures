@@ -130,15 +130,18 @@ print(f"Ringi ümbermõõt = {round(ringi_ümbermõõt, 2)}")
 print("\n------- Ülesanne 4 -------\n")
 
 maa_raadius_km = 6378
-mündi_läbimõõt_mm = 25
+maa_raadius_sm = maa_raadius_km * 100000
 
-mundi_läbimõõt_km = mündi_läbimõõt_mm / 1000
+mündi_läbimõõt_sm = 2.575 # d
 
-maa_ümbermõõt_km = 2 * pi * maa_raadius_km
-muntide_arv = maa_ümbermõõt_km / mundi_läbimõõt_km
+# --------------------------------------
 
-print(f"Maa ümbermõõt ekvaatori kohal on: {round(maa_ümbermõõt_km, 2)} km")
-print(f"2-euroseid münte on vaja: {round(muntide_arv, 2)} tükki")
+maa_ümbermõõt_sm = 2 * pi * maa_raadius_sm # P
+muntide_arv = maa_ümbermõõt_sm / mündi_läbimõõt_sm
+
+print(f"Maa ümbermõõt ekvaatori kohal on {round(maa_ümbermõõt_sm, 2)} SM või {round(maa_ümbermõõt_sm / 100000, 2)} KM")
+print(f"Meil on vaja {int(muntide_arv):,d} mündi.")
+print(f"Meil on vaja {int(muntide_arv*2):,d} euro.")
 
 # --------------------------------------
 # 5.
