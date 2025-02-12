@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>06b023c2-f9e7-43ca-8925-678430473a32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>IseseisevTöö1.py</StartupFile>
+    <StartupFile>ÜlesandedIF.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,6 +25,8 @@
     <Compile Include="IseseisevTöö1.py" />
     <Compile Include="Tund1.py" />
     <Compile Include="Tund2.py" />
+    <Compile Include="Tund3.py" />
+    <Compile Include="ÜlesandedIF.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="funcs.txt" />
