@@ -2,7 +2,8 @@
 # Tund 5
 # --------------------------------------
 
-import math
+from math import *
+from random import *
 
 # --------------------------------------
 # 1.
@@ -150,36 +151,97 @@ import math
 # --------------------------------------
 # 9.
 
-while True:
-    try:
-        S = float(input("Sisesta sum => "))
-        N = int(input("Sisesta aastad => "))
+# while True:
+#     try:
+#         S = float(input("Sisesta sum => "))
+#         N = int(input("Sisesta aastad => "))
 
-        for i in range(N):
-            S *= 1.03
+#         for i in range(N):
+#             S *= 1.03
 
-        break
-    except Exception as e:
-        print(f"ERROR: {e}")
+#         break
+#     except Exception as e:
+#         print(f"ERROR: {e}")
 
-print(f"Vastus: {S:.2f}")
+# print(f"Vastus: {S:.2f}")
 
 # --------------------------------------
 # 10.
 
-while True:
-    try:
-        for i in range(1, 11):
-            arv1 = float(input("Sisesta esimine arv => "))
-            arv2 = float(input("Sisesta teise arv => "))
+# while True:
+#     try:
+#         for i in range(1, 11):
+#             arv1 = float(input("Sisesta esimine arv => "))
+#             arv2 = float(input("Sisesta teise arv => "))
 
-            if arv1 > arv2:
-                print(f"Suurem on {arv1}")
-            elif arv2 > arv1:
-                print(f"Suurem on {arv2}")     
-        break
-    except Exception as e:
-        print(f"ERROR: {e}")
+#             if arv1 > arv2:
+#                 print(f"Suurem on {arv1}")
+#             elif arv2 > arv1:
+#                 print(f"Suurem on {arv2}")     
+#         break
+#     except Exception as e:
+#         print(f"ERROR: {e}")
+
+# --------------------------------------
+# 11.
+
+# try:
+#     K = randint(1, 50)
+#     print(f"Genereeritud number: {K}")
+
+#     product = 1
+
+#     for num in range(11, 100, 2):
+#         if num % K == 0:
+#             product *= num
+
+#     if product > 1:
+#         print(f"Kahekohaliste paaritute arvude korrutis, mis on jagatavad {K}: {product}")
+#     else:
+#         print(f"Ei ole kahekohalisi paarituid numbreid, mis on jagatavad {K}.")
+# except Exception as e:
+#     print(f"ERROR: {e}")
+
+# --------------------------------------
+# 12.
+
+# try:
+#     N = int(input("Sisestage heinategijate arv: "))
+#     M = int(input("Sisestage esimese heinaküünla tööaeg (tundid): "))
+
+#     tund = 0
+#     for i in range(N):
+#         tund += M + (i * 10 / 60)
+
+#     print(f"Kogu meeskond töötas {round(tund)} tundi.")
+# except Exception as e:
+#     print(f"ERROR: {e}")
+
+# --------------------------------------
+# 13.
+
+# arv = 0
+# summa = 0
+
+# for i in range(100, 1001):
+#     if i % 7 == 0:
+#         arv += 1
+#         summa += i
+
+# print(f"jagatavate arvude arv: {arv}")
+# print(f"jagatavate arvude summa: {summa}")
+
+# --------------------------------------
+# 14.
+
+# N = randint(1, 20)
+# vastus = 1
+
+# for i in range(1, N + 1):
+#     vastus *= i
+
+# print(f"Juhuslik number N: {N}")
+# print(f"Numbrite 1 kuni {N}: {vastus}")
 
 # --------------------------------------
 # 15.
@@ -189,3 +251,45 @@ while True:
 #         print(i, end=" ")
 #     print()
 # print()
+
+# --------------------------------------
+# 16.
+
+# for j in range(9):
+#     for i in range(9):
+#         if i == j:
+#             print(j + 1, end=" ")
+#         else:
+#             print("0", end=" ")
+#     print()
+
+# --------------------------------------
+# 17.
+
+# for i in range(1, 10):
+#     print(f"2*{i}={2 * i}")
+
+# --------------------------------------
+# 18.
+
+# for num in range(20, 51):
+#     if num % 3 == 0 and num % 5 != 0:
+#         print(num)
+
+# --------------------------------------
+# 19.
+
+# for num in range(35, 88):
+#     if num % 7 in {1, 2, 5}:
+#         print(num)
+
+# --------------------------------------
+# 20.
+
+summa = 0
+
+for num in range(1, 51):
+    if num % 5 == 0 or num % 7 == 0:
+        summa += num
+
+print("Summa:", summa)
