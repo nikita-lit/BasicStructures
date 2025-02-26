@@ -2,15 +2,21 @@
 import random
 
 ül_tehtud = 0
+debug = True
 
 try:
     while True:
         try:
             tase = int(input(f"Sisesta tase (1, 2, 3) => "))
-            if tase > 3 or tase < 0:
+            if tase > 3 or tase <= 0:
                 print("Vale tase!")
             else:
-                ül_arv = int(input(f"Mitu ülesannet soovite lahendada? => "))
+                while True:
+                    ül_arv = int(input(f"Mitu ülesannet soovite lahendada? => "))
+                    if ül_arv <= 0:
+                        print("Vale number!")
+                    else:
+                        break
                 break
         except Exception as e:
             print(f"ERROR: {e}")
@@ -27,7 +33,7 @@ try:
             arv1 = random.randint(-50, 50)
             arv2 = random.randint(-50, 50)
 
-            if oper == 2:
+            if oper == 2 or oper == 3:
                 arv1 = random.randint(-10, 10)
                 arv2 = random.randint(-10, 10)
         elif tase == 3:
@@ -45,8 +51,17 @@ try:
             print("Vale tase!")
             break
 
+        vastus = float(eval(str(arv1)+tehed[oper]+str(arv2)))
+
+        print()
+        print("--------------------------------------")
+        print(f"{i+1} / {ül_arv}")
+        print("--------------------------------------")
         print()
         print(f"{arv1} {tehed[oper]} {arv2} = ?")
+        if debug:
+            print(f"[Debug] Vastus: {vastus}")
+        print()
 
         while True:
             try:
@@ -54,8 +69,6 @@ try:
                 break
             except Exception as e:
                 print(f"ERROR: {e}")
-
-        vastus = float(eval(str(arv1)+tehed[oper]+str(arv2)))
 
         print(f"Teie vastus: {kasutaja_vastus}")
         print(f"Õige vastus: {vastus}")
@@ -68,8 +81,22 @@ try:
 
         print()
 
-    print()
+    print("--------------------------------------")
     print(f"Õigesti tehtud ülesanded kokku: {ül_tehtud}/{ül_arv}")
+
+    protsent = (ül_tehtud/ül_arv) * 100
+    print(f"Protsent: {protsent}%")
+    if protsent >= 90:
+        hinne = 5
+    elif protsent >= 75 and protsent <= 90:
+        hinne = 4
+    elif protsent >= 60 and protsent <= 75:
+        hinne = 3
+    else:
+        hinne = 2
+    print(f"Teie hinne:  {hinne}")
+    print("--------------------------------------")
+
     print()
 
 except Exception as e:
