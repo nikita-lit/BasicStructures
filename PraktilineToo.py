@@ -27,22 +27,25 @@ while True:
 
             if tase == 1:
                 oper = random.randint(0, 1)
+
                 arv1 = random.randint(0, 50)
                 arv2 = random.randint(0, 50)
             elif tase == 2:
                 oper = random.randint(0, 3)
+
                 arv1 = random.randint(-50, 50)
                 arv2 = random.randint(-50, 50)
 
-                if oper == 2 or oper == 3:
+                if oper == 2 or oper == 3: # / or *
                     arv1 = random.randint(-10, 10)
                     arv2 = random.randint(-10, 10)
             elif tase == 3:
                 oper = random.randint(0, 4)
-                if oper == 4:                
+
+                if oper == 4: # **             
                     arv1 = random.randint(1, 6)
                     arv2 = random.randint(1, 6)
-                elif oper == 2:
+                elif oper == 2: # /
                     arv1 = random.randint(-10, 10)
                     arv2 = random.randint(-10, 10)
                 else:
@@ -53,10 +56,11 @@ while True:
                 break
 
             vastus = float(eval(str(arv1)+tehed[oper]+str(arv2)))
+            vastus = round(vastus, 2)
 
             print()
             print("--------------------------------------")
-            print(f"{i+1} / {ül_arv}")
+            print(f"[{i+1} / {ül_arv}]")
             print("--------------------------------------")
             print()
             print(f"{arv1} {tehed[oper]} {arv2} = ?")
