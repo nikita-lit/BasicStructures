@@ -2,7 +2,7 @@
 import random
 
 ül_tehtud = 0
-debug = True
+debug = False
 
 while True:
     try:
