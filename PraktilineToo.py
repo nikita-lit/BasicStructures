@@ -48,6 +48,11 @@ while True:
                 elif oper == 2: # /
                     arv1 = random.randint(-10, 10)
                     arv2 = random.randint(-10, 10)
+
+                    while arv1 == 0 and oper == 2:
+                        arv1 = random.randint(-10, 10)                    
+                    while arv2 == 0 and oper == 2:
+                        arv2 = random.randint(-10, 10)
                 else:
                     arv1 = random.randint(-50, 50)
                     arv2 = random.randint(-50, 50)
