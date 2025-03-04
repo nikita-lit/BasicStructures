@@ -6,17 +6,20 @@ import time
 # V2
 # --------------------------------------
 # 1. Määrake ja väljastage kasutaja poolt sisestatud N numbri maksimum.
-N = int(input("Sisestage N => "))
-
 max_number = float("-inf")
 
-for i in range(N):
-    number = int(input(f"Sisestage arv {i+1} => "))
- 
-    if number > max_number:
-        max_number = number
+try:
+    N = int(input("Sisestage N => "))
 
-print(f"Max number on: {max_number}")
+    for i in range(N):
+        number = int(input(f"Sisestage arv {i+1}. => "))
+ 
+        if number > max_number:
+            max_number = number
+
+    print(f"Max number on: {max_number}")
+except Exception as e:
+    print(f"ERROR: {e}")
 
 # --------------------------------------
 # V2
