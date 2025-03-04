@@ -5,10 +5,26 @@ import time
 # --------------------------------------
 # V2
 # --------------------------------------
+# 1. Määrake ja väljastage kasutaja poolt sisestatud N numbri maksimum.
+N = int(input("Sisestage N => "))
+
+max_number = float("-inf")
+
+for i in range(N):
+    number = int(input(f"Sisestage arv {i+1} => "))
+ 
+    if number > max_number:
+        max_number = number
+
+print(f"Max number on: {max_number}")
+
+# --------------------------------------
+# V2
+# --------------------------------------
 # 2. Kirjutage programm, mis küsib täisarvu ja väljastab mis tahes selle väärtuse, välja arvatud13. Kui antud arv on13, siis trükitakse selle asemel arv 77.
 
 try:
-    number = int(input("Sisesta arv => "))
+    number = int(input("Sisestage arv => "))
 
     if number == 13:
         number = 77
@@ -35,9 +51,9 @@ print(f"Seitsme päeva pärast jooksed: {round(D, 2)}")
 print()
 try:
     while True:
-        M = float(input("Sisesta pikkus => "))
+        M = float(input("Sisestage pikkus => "))
         if M > 0:
-            X = float(input("Sisesta tükkide arv => "))
+            X = float(input("Sisestage tükkide arv => "))
             if X > 0:
                 if M > X:
                     print("Materjali on piisavalt!")
@@ -74,7 +90,7 @@ try:
     P = int(input("Mitu korda kordame? => "))
 
     while True:
-        arv = float(input("Sisesta arv => "))
+        arv = float(input("Sisestage arv => "))
         if arv < 0:
             vastus += arv
 
@@ -94,7 +110,7 @@ try:
     P = int(input("Mitu korda kordame? => "))
 
     for i in range(P):
-        arv = float(input("Sisesta arv => "))
+        arv = float(input("Sisestage arv => "))
         if arv < 0:
             vastus += arv
 
@@ -114,7 +130,7 @@ aeg = 0.5
 
 try:
     while True:
-        kotlette_kogu_number = int(input("Sisesta kotlette arv => "))
+        kotlette_kogu_number = int(input("Sisestage kotlette arv => "))
         if kotlette_kogu_number > 0:
             break
         else:
