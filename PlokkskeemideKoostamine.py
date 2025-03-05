@@ -40,13 +40,21 @@ except Exception as e:
 # 3. Pärast treeningutega alustamist jooksis sportlane esimesel päeval 10 km. Iga päev suurendas ta oma päevanormi 10% võrra eelmise päeva normist. Kui palju on kogu distants, mille sportlane 7 päeva jooksul läbib?
 
 print()
-D = float(input("Mitu kilomeetrit sa täna jooksid? => "))
-protsent = float(input("Kui palju protsenti te iga päev distantsi suurendate? => "))
 
-for i in range(7):
-    D = D * ((protsent / 100) + 1)
+try:
+    D = float(input("Mitu kilomeetrit sa täna jooksid? => "))
 
-print(f"Seitsme päeva pärast jooksed: {round(D, 2)}")
+    # ДОДЕЛАТЬ
+    #if D >
+
+    protsent = float(input("Kui palju protsenti te iga päev distantsi suurendate? => "))
+
+    for i in range(7):
+        D = D * ((protsent / 100) + 1)
+
+    print(f"Seitsme päeva pärast jooksed: {round(D, 2)}")
+except Exception as e:
+    print(f"ERROR: {e}")
 
 # --------------------------------------
 # 4. On olemas riidetükk pikkusega M meetrit. Sellest lõigatakse järjestikku erineva pikkusega tükke. Kõik andmed riide kasutamise kohta sisestatakse arvutisse. Arvutis peaks ilmuma teade, et materjali ei ole piisavalt, kui soovitakse kasutada olemasolevast pikemat kangatükki.
