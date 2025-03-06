@@ -143,14 +143,17 @@ try:
             print(f"ERROR: {e}")
 
     print()
-    X = min_X
+    if step > 0:
+        X = min_X
+    else:
+        X = max_X
     
     print("--------------------------------------")
     print("X             Y          y = -0.5x + x")
     print("--------------------------------------")
     print()
 
-    while X <= max_X:
+    while (step > 0 and X <= max_X) or (step < 0 and X >= min_X):
         Y = (-0.5 * X) + X
         print(f"{round(X, 2)}             {round(Y, 2)}")
         #print(f"Y = -0.5x + {X}")
