@@ -41,20 +41,30 @@ except Exception as e:
 
 print()
 
-try:
-    D = float(input("Mitu kilomeetrit sa täna jooksid? => "))
+while True:
+    try:
+        while True:
+            D = float(input("Mitu kilomeetrit sa täna jooksid? => "))
 
-    # ДОДЕЛАТЬ
-    #if D >
+            if D > 0:
+                while True:
+                    protsent = float(input("Kui palju protsenti te iga päev distantsi suurendate? => "))
 
-    protsent = float(input("Kui palju protsenti te iga päev distantsi suurendate? => "))
+                    if protsent < 0:
+                        print("Protsent vale! Ta ei tohi olla väiksem kui 0.")
+                    else:
+                        for i in range(7):
+                            D = D * ((protsent / 100) + 1)
 
-    for i in range(7):
-        D = D * ((protsent / 100) + 1)
+                        print(f"Seitsme päeva pärast jooksed: {round(D, 2)}")
+                        break
+                break
+            else:
+                print("Vale kilomeetrit! Ta ei tohi olla negatiivne!")
 
-    print(f"Seitsme päeva pärast jooksed: {round(D, 2)}")
-except Exception as e:
-    print(f"ERROR: {e}")
+        break
+    except Exception as e:
+        print(f"ERROR: {e}")
 
 # --------------------------------------
 # 4. On olemas riidetükk pikkusega M meetrit. Sellest lõigatakse järjestikku erineva pikkusega tükke. Kõik andmed riide kasutamise kohta sisestatakse arvutisse. Arvutis peaks ilmuma teade, et materjali ei ole piisavalt, kui soovitakse kasutada olemasolevast pikemat kangatükki.
