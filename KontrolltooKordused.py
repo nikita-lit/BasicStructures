@@ -139,6 +139,8 @@ try:
                 print("Samm on positiivne: min X ei saa olla suurem kui max X")
             elif step < 0 and min_X > max_X:
                 print("Samm on negatiivne: max X ei saa olla väiksem kui min X")
+            elif step == 0:
+                print("Samm vale! Samm ei saa olla 0")
             else:
                 break
         except Exception as e:
