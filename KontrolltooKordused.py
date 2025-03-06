@@ -135,8 +135,10 @@ try:
             max_X = int(input(f"Sisesta max X => "))
             step = float(input(f"Sisesta samm => "))
 
-            if min_X > max_X:
-                print("min X ei saa olla suurem kui max X")
+            if step > 0 and min_X > max_X:
+                print("Samm on positiivne: min X ei saa olla suurem kui max X")
+            elif step < 0 and min_X > max_X:
+                print("Samm on negatiivne: max X ei saa olla väiksem kui min X")
             else:
                 break
         except Exception as e:
