@@ -110,7 +110,7 @@ for i in range(district_number):
     districts_density_sum += density
     print(f"Ringkond {i+1}.")
     print(f"Rahvarv: {population}")
-    print(f"Pindala: {area}")
+    print(f"Pindala: {area} km²")
     print(f"Asustustihedus: {round(density, 2)} inimest km² kohta")
     print()
     
