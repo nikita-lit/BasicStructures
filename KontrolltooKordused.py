@@ -146,14 +146,16 @@ try:
     X = min_X
     
     print("--------------------------------------")
-    print("X         /         Y                 ")
+    print("X             Y          y = -0.5x + x")
     print("--------------------------------------")
+    print()
 
     while X <= max_X:
         Y = (-0.5 * X) + X
-        print(f"{X}             {Y}")
+        print(f"{round(X, 2)}             {round(Y, 2)}")
         #print(f"Y = -0.5x + {X}")
         #print(f"Y = {Y}")
+        print("--------------------------------------")
         print()
         X += step
 
