@@ -24,6 +24,7 @@
     <Compile Include="BasicStructures.py" />
     <Compile Include="IseseisevTöö1.py" />
     <Compile Include="KontrolltooKordused.py" />
+    <Compile Include="PraktilineToo2.py" />
     <Compile Include="Tund6.py" />
     <Compile Include="PlokkskeemideKoostamine.py" />
     <Compile Include="PraktilineToo.py" />
