@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>06b023c2-f9e7-43ca-8925-678430473a32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>PraktilineToo2.py</StartupFile>
+    <StartupFile>MangKiviPaberKaarid.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -24,6 +24,7 @@
     <Compile Include="BasicStructures.py" />
     <Compile Include="IseseisevTöö1.py" />
     <Compile Include="KontrolltooKordused.py" />
+    <Compile Include="MangKiviPaberKaarid.py" />
     <Compile Include="PraktilineToo2.py" />
     <Compile Include="Tund6.py" />
     <Compile Include="PlokkskeemideKoostamine.py" />
