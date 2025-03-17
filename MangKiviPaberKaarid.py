@@ -31,7 +31,12 @@ for i in range(3):
     player[PLY_CHOICE] = ""
     players.append(player)
 
-rounds = int(input("Kui palju voorusid tahad mängida? "))
+while True:
+    try:
+        rounds = int(input("Kui palju voorusid tahad mängida? "))
+        break
+    except Exception as e:
+        print(f"ERROR: {e}")
 
 for round_num in range(0, rounds):
     print()
@@ -80,14 +85,13 @@ for i in range(len(players)):
     points.append(player[PLY_SCORE])
 
 max_points = max(points)
-winner_index = points.index(max_points)
-draw = False
 
+winner_indixes = []
 for i in range(len(players)):
-    if players[winner_index][PLY_SCORE] == players[i][PLY_SCORE]:
-        draw = True
-        print("Viik!")
-        break
+    if players[i][PLY_SCORE] == max_points:
+        winner_indixes.append(i)
 
-if not draw:
-    print(f"{players[winner_index][PLY_NAME]} on võitja!")
+if len(winner_indixes) == 1:
+    print(f"{players[winner_indixes[0]] [PLY_NAME]} on võitja!")
+else:
+    print("Viik!")
