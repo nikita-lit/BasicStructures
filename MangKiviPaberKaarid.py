@@ -16,9 +16,17 @@ PLY_CHOICE = 2
 
 players = []
 
-for i in range(2):
+for i in range(3):
     player = [f"Player {i+1}", 0, ""]
-    player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi või 'robot' => ").title()
+    if i == 0:
+        player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi => ").title()
+    else:
+        player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi või 'robot' => ").title()
+
+    if i > 0:
+        if player[PLY_NAME] == players[i-1][PLY_NAME]:
+            player[PLY_NAME] = player[PLY_NAME] + str(i)
+
     player[PLY_SCORE] = 0
     player[PLY_CHOICE] = ""
     players.append(player)
@@ -32,7 +40,7 @@ for round_num in range(0, rounds):
     for i in range(len(players)):
         while True:
             time.sleep(0.5)
-            if players[i][PLY_NAME].lower() == "robot":
+            if "robot" in players[i][PLY_NAME].lower() and i != 0:
                 choice = random.choice(choices)
             else:
                 choice = input(f"Player {players[i][PLY_NAME]} vali {choices} => ").lower()
@@ -47,8 +55,20 @@ for round_num in range(0, rounds):
 
     print()
     for i in range(len(players)):
-        player = players[i]
-        print(f"Player {player[PLY_NAME]} valis: {player[PLY_CHOICE]}")
+        for j in range(i + 1, len(players)):
+            choice1 = players[i][PLY_CHOICE]
+            choice2 = players[j][PLY_CHOICE]
+            if choice1 == choice2:
+                print(f"Viik vahel {players[i][PLY_NAME]} ja {players[j][PLY_NAME]}")
+            elif (choice1 == "kivi" and choice2 == "käärid") or \
+                 (choice1 == "käärid" and choice2 == "paber") or \
+                 (choice1 == "paber" and choice2 == "kivi"):
+                print(f"{players[i][PLY_NAME]} võitis {players[j][PLY_NAME]}")
+                players[i][PLY_SCORE] += 1
+            else:
+                print(f"{players[j][PLY_NAME]} võitis {players[i][PLY_NAME]}")
+                players[j][PLY_SCORE] += 1
+
 
 print()
 print("Mängu lõpp!")
