@@ -10,13 +10,15 @@ import time
 
 choices = ["kivi", "käärid", "paber"]
 
+PLAYER_COUNT = 2
+
 PLY_NAME = 0
 PLY_SCORE = 1
 PLY_CHOICE = 2
 
 players = []
 
-for i in range(2):
+for i in range(PLAYER_COUNT):
     player = [f"Player {i+1}", 0, ""]
     if i == 0:
         player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi => ").title()
@@ -75,7 +77,7 @@ for round_num in range(rounds):
                 print(f"{players[j][PLY_NAME]} võitis {players[i][PLY_NAME]}")
                 players[j][PLY_SCORE] += 1
 
-
+time.sleep(1)
 print()
 print("Mängu lõpp!")
 points = []
@@ -96,3 +98,5 @@ if len(winner_indixes) == 1:
     print(f"{players[winner_indixes[0]] [PLY_NAME]} on võitja!")
 else:
     print("Viik!")
+
+print()
