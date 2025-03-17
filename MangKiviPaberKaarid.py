@@ -16,16 +16,17 @@ PLY_CHOICE = 2
 
 players = []
 
-for i in range(3):
+for i in range(2):
     player = [f"Player {i+1}", 0, ""]
     if i == 0:
         player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi => ").title()
     else:
         player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi või 'robot' => ").title()
 
-    if i > 0:
-        if player[PLY_NAME] == players[i-1][PLY_NAME]:
-            player[PLY_NAME] = player[PLY_NAME] + str(i)
+    if i != 0:
+        for j in range(i):
+            if player[PLY_NAME] == players[j][PLY_NAME]:
+                player[PLY_NAME] = player[PLY_NAME] + str(i)
 
     player[PLY_SCORE] = 0
     player[PLY_CHOICE] = ""
@@ -38,7 +39,7 @@ while True:
     except Exception as e:
         print(f"ERROR: {e}")
 
-for round_num in range(0, rounds):
+for round_num in range(rounds):
     print()
     print(f"Voor {round_num+1}. algab!")
 
