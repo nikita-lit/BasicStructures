@@ -8,7 +8,7 @@ import time
 
 # --------------------------------------
 
-choices = ["kivi", "käärid", "paber"]
+CHOICES = ["kivi", "käärid", "paber"]
 
 PLAYER_COUNT = 2
 
@@ -28,7 +28,7 @@ for i in range(PLAYER_COUNT):
     if i != 0:
         for j in range(i):
             if player[PLY_NAME] == players[j][PLY_NAME]:
-                player[PLY_NAME] = player[PLY_NAME] + str(i)
+                player[PLY_NAME] = player[PLY_NAME] + str(i+1)
 
     player[PLY_SCORE] = 0
     player[PLY_CHOICE] = ""
@@ -49,11 +49,11 @@ for round_num in range(rounds):
         while True:
             time.sleep(0.5)
             if "robot" in players[i][PLY_NAME].lower() and i != 0:
-                choice = random.choice(choices)
+                choice = random.choice(CHOICES)
             else:
-                choice = input(f"Player {players[i][PLY_NAME]} vali {choices} => ").lower()
+                choice = input(f"Player {players[i][PLY_NAME]} vali {CHOICES} => ").lower()
 
-            if choice in choices:
+            if choice in CHOICES:
                 players[i][PLY_CHOICE] = choice
                 print(f"Player {players[i][PLY_NAME]} valis: {players[i][PLY_CHOICE]}")
                 break
