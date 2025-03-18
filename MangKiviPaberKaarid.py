@@ -10,7 +10,7 @@ import time
 
 CHOICES = ["kivi", "käärid", "paber"]
 
-PLAYER_COUNT = 2
+PLAYER_COUNT = 3
 
 PLY_NAME = 0
 PLY_SCORE = 1
@@ -31,7 +31,7 @@ for i in range(PLAYER_COUNT):
     if i != 0:
         for j in range(i):
             if player[PLY_NAME] == players[j][PLY_NAME]:
-                player[PLY_NAME] = player[PLY_NAME] + str(i+1)
+                player[PLY_NAME] = player[PLY_NAME] + str(j+1)
 
     player[PLY_SCORE] = 0
     player[PLY_CHOICE] = ""
