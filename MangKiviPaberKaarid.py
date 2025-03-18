@@ -10,7 +10,7 @@ import time
 
 CHOICES = ["kivi", "käärid", "paber"]
 
-PLAYER_COUNT = 2
+PLAYER_COUNT = 3
 
 PLY_NAME = 0
 PLY_SCORE = 1
@@ -63,9 +63,11 @@ for round_num in range(rounds):
 
     print()
     for i in range(len(players)):
-        for j in range(i + 1, len(players)):
+        for j in range(len(players)):
+            if j == i: continue
             choice1 = players[i][PLY_CHOICE]
             choice2 = players[j][PLY_CHOICE]
+
             if choice1 == choice2:
                 print(f"Viik vahel {players[i][PLY_NAME]} ja {players[j][PLY_NAME]}")
             elif (choice1 == "kivi" and choice2 == "käärid") or \
@@ -73,9 +75,6 @@ for round_num in range(rounds):
                  (choice1 == "paber" and choice2 == "kivi"):
                 print(f"{players[i][PLY_NAME]} võitis {players[j][PLY_NAME]}")
                 players[i][PLY_SCORE] += 1
-            else:
-                print(f"{players[j][PLY_NAME]} võitis {players[i][PLY_NAME]}")
-                players[j][PLY_SCORE] += 1
 
 time.sleep(1)
 print()
