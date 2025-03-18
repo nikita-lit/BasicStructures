@@ -10,7 +10,7 @@ import time
 
 CHOICES = ["kivi", "käärid", "paber"]
 
-PLAYER_COUNT = 3
+PLAYER_COUNT = 2
 
 PLY_NAME = 0
 PLY_SCORE = 1
@@ -24,6 +24,9 @@ for i in range(PLAYER_COUNT):
         player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi => ").title()
     else:
         player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi või 'robot' => ").title()
+
+    if not player[PLY_NAME].isalpha() and not player[PLY_NAME].isnumeric():
+        player[PLY_NAME] = f"Player {i+1}"
 
     if i != 0:
         for j in range(i):
