@@ -8,13 +8,13 @@ colorama.just_fix_windows_console()
 
 # --------------------------------------
 words = [
-    #'rakendus', 
+    'rakendus', 
     'töö', 
-    #'python', 
-    #'andmebaas', 
-    #'server', 
-    #'interneti', 
-    #'pilv'
+    'python', 
+    'andmebaas', 
+    'server', 
+    'interneti', 
+    'pilv'
 ]
 
 GREEN = '\033[92m'

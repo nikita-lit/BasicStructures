@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>06b023c2-f9e7-43ca-8925-678430473a32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Wordle.py</StartupFile>
+    <StartupFile>Tund7.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -36,6 +36,8 @@
     <Compile Include="Tund4.py" />
     <Compile Include="Tund4_2.py" />
     <Compile Include="Tund5.py" />
+    <Compile Include="Tund7.py" />
+    <Compile Include="Tund7_Moodul.py" />
     <Compile Include="Wordle.py" />
     <Compile Include="ÜlesandedIF.py" />
   </ItemGroup>
