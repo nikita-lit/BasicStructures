@@ -10,7 +10,7 @@ import time
 
 CHOICES = ["kivi", "käärid", "paber"]
 
-PLAYER_COUNT = 3
+PLAYER_COUNT = 2
 
 PLY_NAME = 0
 PLY_SCORE = 1
