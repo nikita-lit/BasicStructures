@@ -8,13 +8,13 @@ colorama.just_fix_windows_console()
 
 # --------------------------------------
 words = [
-    'rakendus', 
+    #'rakendus', 
     'töö', 
-    'python', 
-    'andmebaas', 
-    'server', 
-    'interneti', 
-    'pilv'
+    #'python', 
+    #'andmebaas', 
+    #'server', 
+    #'interneti', 
+    #'pilv'
 ]
 
 GREEN = '\033[92m'
@@ -38,25 +38,18 @@ while True:
             else:
                 print(f"Palun sisestage sõna, mille pikkus on täpselt {random_word_length} tähemärki.")
     
-        colored_guess = []
-        yellow_letters  = []
-    
-        for j in range(random_word_length):
-            if guess[j] == random_word[j]:
-                colored_guess.append(f"{GREEN}{guess[j]}{WHITE}")
-            else:
-                colored_guess.append(None)
-                yellow_letters.append(random_word[j])
+
+        color_guess = []
 
         for j in range(random_word_length):
-            if colored_guess[j] == None:
-                if guess[j] in yellow_letters:
-                    colored_guess[j] = f"{YELLOW}{guess[j]}{WHITE}"
-                    yellow_letters.remove(guess[j])
-                else:
-                    colored_guess[j] = f"{WHITE}{guess[j]}{WHITE}"
-    
-        print("".join(colored_guess))
+            if guess[j] == random_word[j]:
+                color_guess.insert( j, (GREEN + random_word[j] + WHITE) )
+            elif guess[j] in random_word:
+                color_guess.insert( j, (YELLOW + guess[j] + WHITE) )
+            else:
+                color_guess.insert( j, (WHITE + guess[j] + WHITE) )
+
+        print("".join(color_guess))
     
         if guess == random_word:
             print()
