@@ -59,9 +59,11 @@ while True:
         print("".join(colored_guess))
     
         if guess == random_word:
+            print()
             print("Palju õnne! Sa arvasid sõna õigesti!")
             break
         elif i == (ATTEMPTS-1):
+            print()
             print(f"Õige sõna oli: {random_word}. Kahjuks ei õnnestunud ära arvata.")
 
     try:
