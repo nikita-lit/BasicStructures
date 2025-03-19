@@ -23,7 +23,8 @@ def is_year_leap(year: int) -> bool:
 
 def square(side: float) -> any:
     """
-    Returns perimeter of a square, area of ​​a square and diagonal of a square.
+    Returns perimeter, area and diagonal of a square.
+    Tagastab ruudu perimeetri, pindala ja diagonaali.
     """
 
     P = side * 4
@@ -34,7 +35,8 @@ def square(side: float) -> any:
 
 def square_list(side: float) -> list:
     """
-    Returns perimeter of a square, area of ​​a square and diagonal of a square AS LIST.
+    Returns perimeter, area and diagonal of a square AS LIST.
+    Tagastab ruudu perimeetri, pindala ja diagonaali.
     """
 
     P = side * 4
@@ -44,4 +46,38 @@ def square_list(side: float) -> list:
     return list(P, S, D)
 
 def season(month: int) -> str:
-    pass
+    """
+    Tagastab kuu nime numbri järgi.
+    Returns the month name by number.
+    """
+
+    if month in [1, 2, 12]:
+        return "talv"
+    elif month in [9, 10, 11]:
+        return "sügis"
+    elif month in [6, 7, 8]:
+        return "suvi"
+    elif month in [3, 4, 5]:
+        return "kevad"
+
+    return "Tundmatu kuu"
+
+def bank(a: float, years: int) -> float:
+    """
+    Tagastab deposiidi suuruse aastate pärast.
+    Returns the size of the deposit after years.
+    """
+
+    return (a * 1.1) ** years
+
+def is_prime(number: int) -> bool:
+    """
+    Tagastab kas antud arv on algarv.
+    Returns if the given number is prime.
+    """
+
+    d = 2
+    while d * d <= number and number % d != 0:
+        d += 1
+
+    return d * d > number
