@@ -10,32 +10,11 @@ import time
 
 CHOICES = ["kivi", "käärid", "paber"]
 
-PLAYER_COUNT = 2
+player1 = input("Sisestage Player 1 nimi => ").title()
+player1_score = 0
 
-PLY_NAME = 0
-PLY_SCORE = 1
-PLY_CHOICE = 2
-
-players = []
-
-for i in range(PLAYER_COUNT):
-    player = [f"Player {i+1}", 0, ""]
-    if i == 0:
-        player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi => ").title()
-    else:
-        player[PLY_NAME] = input(f"Sisestage Player {i+1} nimi või 'robot' => ").title()
-
-    if not player[PLY_NAME].isalpha() and not player[PLY_NAME].isnumeric():
-        player[PLY_NAME] = f"Player {i+1}"
-
-    if i != 0:
-        for j in range(i):
-            if player[PLY_NAME] == players[j][PLY_NAME]:
-                player[PLY_NAME] = player[PLY_NAME] + str(j+1)
-
-    player[PLY_SCORE] = 0
-    player[PLY_CHOICE] = ""
-    players.append(player)
+player2 = input("Sisestage Player 2 nimi või 'robot' => ").title()
+player2_score = 0
 
 while True:
     try:
@@ -48,56 +27,52 @@ for round_num in range(rounds):
     print()
     print(f"Voor {round_num+1}. algab!")
 
-    for i in range(len(players)):
+    for i in range(2):
         while True:
             time.sleep(0.5)
-            if "robot" in players[i][PLY_NAME].lower() and i != 0:
+            if "robot" in player2.lower() and i != 0:
                 choice = random.choice(CHOICES)
             else:
-                choice = input(f"Player {players[i][PLY_NAME]} vali {CHOICES} => ").lower()
+                if i == 0:
+                    choice = input(f"Player 1 [{player1}] vali {CHOICES} => ").lower()
+                else:
+                    choice = input(f"Player 2 [{player2}] vali {CHOICES} => ").lower()
 
             if choice in CHOICES:
-                players[i][PLY_CHOICE] = choice
-                print(f"Player {players[i][PLY_NAME]} valis: {players[i][PLY_CHOICE]}")
+                if i == 0:
+                    player1_choice = choice
+                    print(f"Player 1 [{player1}] valis: {player1_choice}")
+                else:
+                    player2_choice = choice
+                    print(f"Player 2 [{player2}] valis: {player2_choice}")
+
+                print()
                 break
             else:
                 os.system("cls")
                 print("Vale valik!")
 
-    print()
-    for i in range(len(players)):
-        for j in range(len(players)):
-            if j == i: continue
-            choice1 = players[i][PLY_CHOICE]
-            choice2 = players[j][PLY_CHOICE]
-
-            if choice1 == choice2:
-                print(f"Viik vahel {players[i][PLY_NAME]} ja {players[j][PLY_NAME]}")
-            elif (choice1 == "kivi" and choice2 == "käärid") or \
-                 (choice1 == "käärid" and choice2 == "paber") or \
-                 (choice1 == "paber" and choice2 == "kivi"):
-                print(f"{players[i][PLY_NAME]} võitis {players[j][PLY_NAME]}")
-                players[i][PLY_SCORE] += 1
+    if player1_choice == player2_choice:
+        print(f"Viik vahel {player1} ja {player2}")
+    elif (player1_choice == "kivi" and player2_choice == "käärid") or \
+        (player1_choice == "käärid" and player2_choice == "paber") or \
+        (player1_choice == "paber" and player2_choice == "kivi"):
+        print(f"{player1} võitis {player2}")
+        player1_score += 1
+    else:
+        player2_score += 1
 
 time.sleep(1)
 print()
 print("Mängu lõpp!")
-points = []
 
-for i in range(len(players)):
-    player = players[i]
-    print(f"Player {player[PLY_NAME]} punktid: {player[PLY_SCORE]}")
-    points.append(player[PLY_SCORE])
+print(f"Player 1 [{player1}] punktid: {player1_score}")
+print(f"Player 2 [{player2}] punktid: {player2_score}")
 
-max_points = max(points)
-
-winner_indixes = []
-for i in range(len(players)):
-    if players[i][PLY_SCORE] == max_points:
-        winner_indixes.append(i)
-
-if len(winner_indixes) == 1:
-    print(f"{players[winner_indixes[0]] [PLY_NAME]} on võitja!")
+if player1_score > player2_score:
+    print(f"{player1} on võitja!")
+elif player1_score < player2_score:
+    print(f"{player2} on võitja!")
 else:
     print("Viik!")
 
