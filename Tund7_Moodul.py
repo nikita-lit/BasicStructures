@@ -85,16 +85,20 @@ def is_prime(number: int) -> bool:
     else:
         return False
 
-import calendar
-
 def date(day, month, year) -> bool:
     """
     Tagastab kas antud kuupäev on olemas.
     Returns if the given date is valid.
     """
 
-    try:
-        calendar.weekday(year, month, day)
-        return True
-    except:
-        return False
+    if month in [1,3,5,7,8,10,12]:
+        return day >= 1 and day <= 31
+    elif month in [4,6,9,11]:
+        return day >= 1 and day <= 30
+    elif month == 2:
+        if is_year_leap(year):
+            return day >= 1 and day <= 29
+        else:
+            return day >= 1 and day <= 28
+
+    return False
