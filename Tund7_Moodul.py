@@ -76,8 +76,25 @@ def is_prime(number: int) -> bool:
     Returns if the given number is prime.
     """
 
-    d = 2
-    while d * d <= number and number % d != 0:
-        d += 1
+    if number >= 0 and number <= 1000:
+        d = 2
+        while d * d <= number and number % d != 0:
+            d += 1
 
-    return d * d > number
+        return d * d > number
+    else:
+        return False
+
+import calendar
+
+def date(day, month, year) -> bool:
+    """
+    Tagastab kas antud kuupäev on olemas.
+    Returns if the given date is valid.
+    """
+
+    try:
+        calendar.weekday(year, month, day)
+        return True
+    except:
+        return False
