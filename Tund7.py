@@ -50,14 +50,14 @@ from Tund7_Moodul import *
 # number = int(input("Sisestage number => "))
 # print(is_prime(number) and f"{number} on algarv" or f"{number} ei ole algarv")
 
-# --------------------------------------
-# 7.
+# # --------------------------------------
+# # 7.
 
-day = int(input("Sisestage päev => "))
-month = int(input("Sisestage kuu => "))
-year = int(input("Sisestage aasta => "))
+# day = int(input("Sisestage päev => "))
+# month = int(input("Sisestage kuu => "))
+# year = int(input("Sisestage aasta => "))
 
-print(date(day, month, year) and "Kuupäev on olemas" or "Kuupäev ei ole olemas")
+# print(date(day, month, year) and "Kuupäev on olemas" or "Kuupäev ei ole olemas")
 
 # --------------------------------------
 # 8.
