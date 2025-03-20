@@ -85,7 +85,7 @@ def is_prime(number: int) -> bool:
     else:
         return False
 
-def date(day, month, year) -> bool:
+def date(day: int, month: int, year: int) -> bool:
     """
     Tagastab kas antud kuupäev on olemas.
     Returns if the given date is valid.
@@ -102,3 +102,32 @@ def date(day, month, year) -> bool:
             return day >= 1 and day <= 28
 
     return False
+
+# ord - возрощает номер символа в Unicode
+# chr - возрощает символ по номеру в Unicode
+
+def XOR_cipher(plaintext, key):
+    cipher_text = ""
+
+    for i, char in enumerate(plaintext):
+        char_code = ord(char)
+        key_code = ord(key[i % len(key)])
+
+        encrypted_code = char_code ^ key_code
+        cipher_text += chr(encrypted_code)
+        
+    return cipher_text
+
+
+def XOR_uncipher(ciphertext, key):
+    text = ""
+
+    for i, char in enumerate(ciphertext):
+        char_code = ord(char)
+        key_code = ord(key[i % len(key)])
+        
+        decrypted_code = char_code ^ key_code
+
+        text += chr(decrypted_code)
+        
+    return text

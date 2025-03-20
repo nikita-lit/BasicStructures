@@ -61,3 +61,9 @@ from Tund7_Moodul import *
 
 # --------------------------------------
 # 8.
+
+cipher = XOR_cipher("test", "key")
+print(cipher)
+
+uncipher = XOR_uncipher(cipher, "key")
+print(uncipher)
