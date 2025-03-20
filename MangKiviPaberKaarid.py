@@ -27,30 +27,36 @@ for round_num in range(rounds):
     print()
     print(f"Voor {round_num+1}. algab!")
 
-    for i in range(2):
-        while True:
-            time.sleep(0.5)
-            if "robot" in player2.lower() and i != 0:
-                choice = random.choice(CHOICES)
-            else:
-                if i == 0:
-                    choice = input(f"Player 1 [{player1}] vali {CHOICES} => ").lower()
-                else:
-                    choice = input(f"Player 2 [{player2}] vali {CHOICES} => ").lower()
+    while True:
+        time.sleep(0.5)
+        choice = input(f"Player 1 [{player1}] vali {CHOICES} => ").lower()
 
-            if choice in CHOICES:
-                if i == 0:
-                    player1_choice = choice
-                    print(f"Player 1 [{player1}] valis: {player1_choice}")
-                else:
-                    player2_choice = choice
-                    print(f"Player 2 [{player2}] valis: {player2_choice}")
+        if choice in CHOICES:
+            player1_choice = choice
+            print(f"Player 1 [{player1}] valis: {player1_choice}")
+            print()
+            break
+        else:
+            os.system("cls")
+            print("Vale valik!")  
+            
+    while True:
+        time.sleep(0.5)
+        if "robot" in player2.lower():
+            choice = random.choice(CHOICES)
+        else:
+            choice = input(f"Player 2 [{player2}] vali {CHOICES} => ").lower()
 
-                print()
-                break
-            else:
-                os.system("cls")
-                print("Vale valik!")
+        if choice in CHOICES:
+            player2_choice = choice
+            print(f"Player 2 [{player2}] valis: {player2_choice}")
+            print()
+            break
+        else:
+            os.system("cls")
+            print("Vale valik!")
+
+
 
     if player1_choice == player2_choice:
         print(f"Viik vahel {player1} ja {player2}")
