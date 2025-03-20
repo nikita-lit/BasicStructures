@@ -27,6 +27,7 @@ for round_num in range(rounds):
     print()
     print(f"Voor {round_num+1}. algab!")
 
+    # Player 1
     while True:
         time.sleep(0.5)
         choice = input(f"Player 1 [{player1}] vali {CHOICES} => ").lower()
@@ -40,6 +41,7 @@ for round_num in range(rounds):
             os.system("cls")
             print("Vale valik!")  
             
+    # Player 2
     while True:
         time.sleep(0.5)
         if "robot" in player2.lower():
