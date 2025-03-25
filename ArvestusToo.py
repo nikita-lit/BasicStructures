@@ -12,8 +12,20 @@
 opilased = []
 puudumised = []
 
-def kool():
+def find_best_students(n: int):
     pass
 
-def find_best_students(n: int):
+def sort_absences():
+    pass
+
+def students_to_commission():
+    pass
+
+def expel_student():
+    pass
+
+def test():
+    pass
+
+def kool():
     pass
