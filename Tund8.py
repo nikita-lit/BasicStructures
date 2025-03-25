@@ -15,7 +15,7 @@ users = [
 ]
 current_user = 1
 
-def get_user(name):
+def get_user(name: str) -> any:
     for user in users:
         if user[USER_NAME] == name:
             return user
@@ -90,7 +90,7 @@ def logout():
     time.sleep(2)
     open_menu()
 
-def ask_new_password():
+def ask_new_password() -> str:
     while True:
         new_password = get_input(str, "Sisestage uus parool => ")
         if is_password_valid(new_password):
@@ -173,7 +173,6 @@ def open_option(option: int):
         print("Teil ei ole õigusi.")
         time.sleep(2)
         open_menu()
-        return
 
 options = [
     ["Registreerimine", "registration()", ["user", "admin", "guest"]],

@@ -39,7 +39,7 @@ def generate_password() -> str:
     psword = ''.join([random.choice(ls) for x in range(12)])
     return psword
 
-def is_password_valid(password) -> bool:
+def is_password_valid(password: str) -> bool:
     """
     Tagastab tõene, kui parool on õige. 
     Parool peab sisaldama vähemalt numbreid või tähti ja olema vähemalt 4 tähemärki pikk.
@@ -65,7 +65,7 @@ def is_password_valid(password) -> bool:
 
     return True
 
-def is_user_name_valid(user_name) -> bool:
+def is_user_name_valid(user_name: str) -> bool:
     """
     Tagastab väärtuse Tõene, kui nimi on õige.
     Nimi ei koosne ainult numbritest ja nime pikkus on üle 3 tähemärgi.
@@ -83,7 +83,7 @@ def is_user_name_valid(user_name) -> bool:
 
     return True
 
-def is_admin(user) -> bool:
+def is_admin(user: list) -> bool:
     """
     Tagastab väärtuse Tõene, kui kasutajal on külalisõigused.
     Возвращает True если у пользователя есть права гостя
@@ -91,7 +91,7 @@ def is_admin(user) -> bool:
 
     return "admin" in user[USER_RIGHTS]
 
-def is_guest(user) -> bool:
+def is_guest(user: list) -> bool:
     """
     Tagastab väärtuse Tõene, kui kasutajal on administraatori õigused.
     Возвращает True если у пользователя есть права админа.
