@@ -58,8 +58,6 @@ def registration():
     open_menu()
 
 def login():
-    logedin = False
-
     while True:
         user_name = get_input(str, "Sisestage kasutaja nimi => ")
         if user_name.lower() == "guest":
@@ -73,19 +71,15 @@ def login():
                 print(f"Tere tulemast, {user[USER_NAME]}!")
                 global current_user
                 current_user = key
-                logedin = True
-                break
+
+                time.sleep(2)
+                open_menu()
+                return
         else:
             print("Vale nimi või parool!")
 
-        if logedin:
-            break
-
         time.sleep(1)
         ask_menu()
-
-    time.sleep(2)
-    open_menu()
 
 def logout():
     choice = get_input(str, "Kas te soovite oma kontolt välja logida? (jah/ei) => ")
