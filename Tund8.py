@@ -7,13 +7,6 @@ import time
 
 # --------------------------------------
 
-REG = 0
-LOGIN = 1
-LOGOUT = 2
-CHANGE_DETAILS = 3
-RECOVER = 4
-SHOW_USERS = 5
-
 current_option = 0
 
 users = [
@@ -36,10 +29,6 @@ def ask_menu():
         open_menu()
 
 def registration():
-    print("-------------------------------------")
-    print(options[REG][0])
-    print("-------------------------------------")
-    
     while True:
         user_name = get_input(str, "Sisestage nimi => ")
         if user_name.lower() == "guest":
@@ -69,10 +58,6 @@ def registration():
     open_menu()
 
 def login():
-    print("-------------------------------------")
-    print(options[LOGIN][0])
-    print("-------------------------------------")
-
     logedin = False
 
     while True:
@@ -103,8 +88,6 @@ def login():
     open_menu()
 
 def logout():
-    print(options[LOGOUT][0])
-
     choice = get_input(str, "Kas te soovite oma kontolt välja logida? (jah/ei) => ")
     if choice == "jah" or choice == "1":
         global current_user
@@ -122,8 +105,6 @@ def ask_new_password():
     return new_password
 
 def change_account_details():
-    print(options[CHANGE_DETAILS][0])
-
     while True:
         choice = get_input(str,"Mida soovite oma parooli või nime muuta? (parool/nimi) => ").lower()
 
@@ -156,8 +137,6 @@ def change_account_details():
     open_menu()
     
 def recover_password():
-    print(options[RECOVER][0])
-
     while True:
         user_name = get_input(str, "Sisestage kasutajanimi, mille parool tuleb taastada => ")
         if user_name.lower() == "guest":
@@ -178,7 +157,6 @@ def recover_password():
     open_menu()
     
 def show_users():
-    print(options[SHOW_USERS][0])
     for key, user in enumerate(users):
         print(f"{key+1}.\n  Nimi: {user[USER_NAME]}\n   Parool: {user[USER_PSW]}\n   Õigused: {user[USER_RIGHTS]}")
 
@@ -192,6 +170,9 @@ def open_option(option: int):
 
     for right in users[current_user][USER_RIGHTS]:
         if right in options[option][2]:
+            print("-------------------------------------")
+            print(options[option][0])
+            print("-------------------------------------")
             eval(options[option][1])
             break
     else:
