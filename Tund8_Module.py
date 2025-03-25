@@ -10,9 +10,9 @@ USER_RIGHTS = 2
 
 def get_input(data_type: type, text: str) -> any:
     """
-    Возрощает данные из input с определенным типом даннных.
-    :param (Type) data_type: тип данных.
-    :param (str) text: текст который выводится пользователю.
+    Tagastab määratud andmetüübiga sisendi andmed.
+    :param (tüüp) data_type: andmetüüp.
+    :param (str) tekst: kasutajale kuvatav tekst.
     """
 
     try:
@@ -24,6 +24,7 @@ def get_input(data_type: type, text: str) -> any:
 
 def generate_password() -> str:
     """
+    Genereerib parooli juhuslikult.
     Generates password using random.
     """
 
@@ -39,6 +40,13 @@ def generate_password() -> str:
     return psword
 
 def is_password_valid(password) -> bool:
+    """
+    Tagastab tõene, kui parool on õige. 
+    Parool peab sisaldama vähemalt numbreid või tähti ja olema vähemalt 4 tähemärki pikk.
+    Возвращает True если пароль корректный. 
+    Пароль состоит хотябы из цифр или букв и длина не менее 4 символов.
+    """
+
     alpha = 0
     num = 0
     for char in password:
@@ -51,13 +59,20 @@ def is_password_valid(password) -> bool:
         print("Parool ei sisalda vähemalt numbreid või tähti!")
         return False
 
-    if len(password) < 5:
-        print("Parool on liiga väike. Vähemalt 5 tähemärki!")
+    if len(password) < 4:
+        print("Parool on liiga väike. Vähemalt 4 tähemärki!")
         return False
 
     return True
 
 def is_user_name_valid(user_name) -> bool:
+    """
+    Tagastab väärtuse Tõene, kui nimi on õige.
+    Nimi ei koosne ainult numbritest ja nime pikkus on üle 3 tähemärgi.
+    Возвращает True если имя корректное. 
+    Имя состоит не только из цифр и длина имени не менее 3 символов.
+    """
+
     if user_name.isnumeric():
         print("Nimi ei saa koosneda ainult numbritest.")
         return False
@@ -68,8 +83,18 @@ def is_user_name_valid(user_name) -> bool:
 
     return True
 
-def is_admin(user):
-    if "admin" in user[USER_RIGHTS]:
-        return True
+def is_admin(user) -> bool:
+    """
+    Tagastab väärtuse Tõene, kui kasutajal on külalisõigused.
+    Возвращает True если у пользователя есть права гостя
+    """
 
-    return False
+    return "admin" in user[USER_RIGHTS]
+
+def is_guest(user) -> bool:
+    """
+    Tagastab väärtuse Tõene, kui kasutajal on administraatori õigused.
+    Возвращает True если у пользователя есть права админа.
+    """
+
+    return "guest" in user[USER_RIGHTS]

@@ -21,6 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ArvestusToo.py" />
     <Compile Include="BasicStructures.py" />
     <Compile Include="IseseisevTöö1.py" />
     <Compile Include="KontrolltooKordused.py" />
