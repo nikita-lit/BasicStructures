@@ -73,16 +73,31 @@ def sort_absences():
     print()
 
 # --------------------------------------------
+def average_absences() -> float:
+    """
+    Tagastab keskmise puudumiste arvu.
+    """
+    sum = 0
+    for i in range(len(puudumised)):
+        sum += puudumised[i]
+
+    return sum / len(puudumised)
+
+# --------------------------------------------
 def students_to_commission():
     print("-----------------------------------")
     print("Komisjoni saadetud õpilased (rohkem kui 50 puudumist ja hinne alla 3)")
     print("-----------------------------------")
     print()
+    num = 0
     for i in range(len(opilased)):
         if puudumised[i] > 50 and grades[i] < 3:
             print(f"{opilased[i][0] } {opilased[i][1]}")
             print(f"puudumised: {puudumised[i]}, hinne: {grades[i]}")
             print()
+            num += 1
+
+    print(f"{num} õpilast saadetud komisjoni.")
 
 # --------------------------------------------
 def expel_students():
@@ -103,7 +118,8 @@ def expel_students():
         print(f"puudumised: {puudumised[i]}, hinne: {grades[i]}")
         print()
 
-    for i in to_expel:
+    print(f"{len(to_expel)} õpilast eemaldatud.")
+    for i in reversed(to_expel):
         opilased.pop(i)
         puudumised.pop(i)
         grades.pop(i)
@@ -118,7 +134,8 @@ def kool():
         print("2. Korrasta nimekiri puudumiste arvu järgi")
         print("3. Kuvada õpilased, keda saadetakse komisjoni")
         print("4. Eemalda õpilased, kellel on rohkem kui 100 puudumist")
-        print("5. Lõpeta programm")
+        print("5. Keskmine puudumiste arv")
+        print("6. Lõpeta programm")
         
         print()
         choice = get_input(int, "Sisestage valik number => ")
@@ -139,6 +156,8 @@ def kool():
         elif choice == 4:
             expel_students()
         elif choice == 5:
+            print(f"Keskmine puudumiste arv on {average_absences():.2f}")
+        elif choice == 6:
             break
         else:
             print("Vale valik!")
