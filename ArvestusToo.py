@@ -32,6 +32,13 @@ def fill_data():
 
 # --------------------------------------------
 def sort_best_students(student):
+    """
+    Сортировка по оценки по убыванию (от лучшего к худшему)
+    Сортировка по возрастанию (меньше пропусков — лучше)
+    Sorteerimine klassi järgi kahanevas järjekorras (parimast halvimani)
+    Sorteerimine kasvavas järjekorras (vähem puudujääke - parem)
+    """
+
     return (-student[2], student[1])
 
 def find_best_students(n: int):
