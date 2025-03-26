@@ -109,17 +109,19 @@ def expel_students():
     for i in range(len(opilased)):
         if puudumised[i] > 100 and grades[i] < 2.5:
             to_expel.append(i)
-
-    if len(to_expel) == 0:
-        print("Ei ole õpilasi, keda eemaldada")
     
     for i in to_expel:
         print(f"{opilased[i][0] } {opilased[i][1]}")
         print(f"puudumised: {puudumised[i]}, hinne: {grades[i]}")
         print()
 
-    print(f"{len(to_expel)} õpilast eemaldatud.")
-    for i in reversed(to_expel):
+    if len(to_expel) == 0:
+        print("Ei ole õpilasi, keda eemaldada")
+    else:
+        print(f"{len(to_expel)} õpilast eemaldatud.")
+
+    to_expel.sort(reverse=True)
+    for i in to_expel:
         opilased.pop(i)
         puudumised.pop(i)
         grades.pop(i)
