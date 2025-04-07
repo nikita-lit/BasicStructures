@@ -34,6 +34,7 @@ options = [
     ["Muuta nimi või palk", "change_data(inimesed, palgad)"],
     ["Leia nimed, mis algavad antud tähega", "find_inimesed_by_first_char(inimesed, palgad)"],
     ["Palga tõus", "salary_increase(inimesed, palgad)"],
+    ["Tulemaks", "income_tax(inimesed, palgad)"],
 ]
 
 def open_menu():

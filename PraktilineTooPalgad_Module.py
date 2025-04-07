@@ -9,7 +9,7 @@ def get_inimene_index_by_name(inimesed: list, palgad: list, input_text: str) -> 
                 indixes.append(key)
 
         if len(indixes) > 1:
-            print(f"Leiti mitu inimest nimega {name}. Palun valige, keda muuta:")
+            print(f"Leiti mitu inimest nimega {name}. Palun valige:")
             for i, index in enumerate(indixes):
                 print(f"{i + 1}. Inimene: {inimesed[index]} Palk: {palgad[index]}")
 
@@ -200,5 +200,20 @@ def salary_increase(inimesed: list, palgad: list):
         
         future_salary = palgad[selected_index] * (1.05 ** years)
         print(f"{inimesed[selected_index]} uus palk pärast {years} aastat on {future_salary:.2f} eurot.")
+    else:
+        print("Isikut ei leitud!")
+
+def income_tax(inimesed: list, palgad: list):
+    """
+    Arvutab töötaja netopalga, arvestades 20% tulumaksu, ja kuvab selle.
+    """
+
+    tax = 0.2
+
+    selected_index = get_inimene_index_by_name(inimesed, palgad, "Sisestage nimi => ")
+    if selected_index != -1:
+        salary = palgad[selected_index]
+        neto_salary = salary - (salary * tax)
+        print(f"{inimesed[selected_index]} netopalk on {neto_salary}")
     else:
         print("Isikut ei leitud!")
