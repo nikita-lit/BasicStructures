@@ -29,6 +29,11 @@ options = [
     ["Suurim palk", "biggest_salary(inimesed, palgad)"],
     ["Sorteerimine", "sorting(inimesed, palgad)"],
     ["Võrdsed palgad", "equal_salaries(inimesed, palgad)"],
+
+    ["Keskmine palk", "average_salary(inimesed, palgad)"],
+    ["Muuta nimi või palk", "change_data(inimesed, palgad)"],
+    ["Leia nimed, mis algavad antud tähega", "find_inimesed_by_first_char(inimesed, palgad)"],
+    ["Palga tõus", "salary_increase(inimesed, palgad)"],
 ]
 
 def open_menu():
