@@ -8,8 +8,8 @@ import time
 # --------------------------------------
 
 
-palgad = [1200,2500,750,395,1200]
-inimesed = ["A","B","C","D","E"]
+palgad = [1200,2500,750,395,1200,10000,1500]
+inimesed = ["A","B","C","D","E","F","G"]
 
 def open_option(option: int):
     if not option >= 0 or not option < len(options):

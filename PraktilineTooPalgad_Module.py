@@ -203,17 +203,36 @@ def salary_increase(inimesed: list, palgad: list):
     else:
         print("Isikut ei leitud!")
 
+def calculate_tax_free_amount(salary):
+    """
+    Arvutab maksuvaba.
+    """
+    if salary <= 1200:
+        return 654
+    else:
+        reduction = 654 / 900 * (salary - 1200)
+        tax_free = 654 - reduction
+        return max(0, tax_free)
+
+def calc_neto_salary(salary):
+    """
+    Arvutab netopalga pärast tulumaksu kinnipidamist.
+    """
+
+    tax_free_amount = calculate_tax_free_amount(salary)
+    taxable_income = max(0, salary - tax_free_amount)
+    income_tax = taxable_income * 0.2
+    return salary - income_tax
+
 def income_tax(inimesed: list, palgad: list):
     """
     Arvutab töötaja netopalga, arvestades 20% tulumaksu, ja kuvab selle.
     """
 
-    tax = 0.2
-
     selected_index = get_inimene_index_by_name(inimesed, palgad, "Sisestage nimi => ")
     if selected_index != -1:
         salary = palgad[selected_index]
-        neto_salary = salary - (salary * tax)
-        print(f"{inimesed[selected_index]} netopalk on {neto_salary}")
+        neto = calc_neto_salary(salary)
+        print(f"{inimesed[selected_index]}: brutopalk {salary} €, netopalk {neto:.2f} €")
     else:
         print("Isikut ei leitud!")
