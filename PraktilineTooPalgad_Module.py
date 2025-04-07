@@ -76,3 +76,17 @@ def sorting(inimesed: list, palgad: list):
             if eval( str(palgad[n])+v+str(palgad[m])):
                 palgad[n], palgad[m] = palgad[m], palgad[n]
                 inimesed[n], inimesed[m] = inimesed[m], inimesed[n]
+
+def equal_salaries(inimesed: list, palgad: list):
+
+    hulk = set(palgad)
+    print(hulk)
+    for salary in hulk:
+        count = palgad.count(salary)
+        if count > 1:
+            print(f"Palk {salary}")
+            index = palgad.index(salary)
+            for j in range(count):
+                index = palgad.index(salary, index)
+                print(f"Saab kätte {inimesed[index]}")
+                index += 1

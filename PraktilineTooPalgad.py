@@ -16,7 +16,9 @@ def open_option(option: int):
         open_menu()
         return
 
+    print("-------------------------------------")
     eval(options[option][1])
+    print("-------------------------------------")
 
     time.sleep(2)
     open_menu()
@@ -26,15 +28,19 @@ options = [
     ["Kustuta andmed", "delete_data(inimesed, palgad)"],
     ["Suurim palk", "biggest_salary(inimesed, palgad)"],
     ["Sorteerimine", "sorting(inimesed, palgad)"],
+    ["Võrdsed palgad", "equal_salaries(inimesed, palgad)"],
 ]
 
 def open_menu():
     print()
+    print("-------------------------------------")
     print("Andmed:")
+    print("-------------------------------------")
 
     for key, value in enumerate(inimesed):
         print(f"Inimene: {value}\n  Palk: {palgad[key]}")
 
+    print("-------------------------------------")
     print()
 
     for key, option in enumerate(options):
