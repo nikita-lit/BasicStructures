@@ -187,3 +187,11 @@ def test_knowledge():
         num += 1
 
     print(f"Test lõppenud! Sinu tulemus: {points}/{max_words}")
+
+def show_dictionary():
+    for lang, words in sonastik.items():
+        print(f"Keel: {languages[lang]}")
+        num = 0
+        for word in words:
+            print(f"    {num+1}. {word}")
+            num += 1

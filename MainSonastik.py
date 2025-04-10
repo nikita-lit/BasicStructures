@@ -25,6 +25,7 @@ options = [
     ["Lisa uus sõna", "add_word_to_dict()"],
     ["Paranda sõna", "correct_word()"],
     ["Testi teadmisi", "test_knowledge()"],
+    ["Kuva sõnastik", "show_dictionary()"],
 ]
 
 def open_menu():
