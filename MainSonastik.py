@@ -23,6 +23,8 @@ def open_option(option: int):
 options = [
     ["Tõlge", "translate()"],
     ["Lisa uus sõna", "add_word_to_dict()"],
+    ["Paranda sõna", "correct_word()"],
+    ["Testi teadmisi", "test_knowledge()"],
 ]
 
 def open_menu():
