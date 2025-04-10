@@ -10,9 +10,9 @@ import random
 # --------------------------------------
 
 languages = {
-    "est": "Eesti keel", 
-    "rus": "Vene keel", 
-    "eng": "Inglise keel"
+    "est": "Eesti", 
+    "rus": "Vene", 
+    "eng": "Inglise"
 }
 
 sonastik = {}
