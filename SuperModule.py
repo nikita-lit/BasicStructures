@@ -1,3 +1,4 @@
+import time
 
 def get_input(data_type: type, text: str) -> any:
     """
