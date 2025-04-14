@@ -12,14 +12,14 @@ def print_file(file: str):
     for line in read_file(file):
         print(line)
 
-def write_in_file(file: str, lines:list):
+def write_file(file: str, lines:list):
     f = open(file, 'w', encoding="utf-8-sig")
     for line in lines:
         f.write(line + '\n')
     f.close()
 
 names_list = ["Ann", "Kati", "Mari"]
-write_in_file(TUNDTXT, names_list)
+write_file(TUNDTXT, names_list)
 
 print_file(TUNDTXT)
 

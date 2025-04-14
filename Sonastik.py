@@ -16,19 +16,33 @@ languages = {
 }
 
 sonastik = {}
+TXT = "sonastik.txt"
 
+def load_dict_file():
+    dictionary = {}
+    for lang in languages:
+        dictionary[lang] = []
+
+    for line in read_file(TXT):
+        lang, value = line.strip().split("=")
+        words = value.split(",")
+        dictionary[lang] = words
+
+    return dictionary
+
+def save_dict_file():
+    time.sleep(1.5)
+    lines = []
+    for lang, words in sonastik.items():
+        joined_words = ",".join(words)
+        lines.append(f"{lang}={joined_words}")
+
+    write_file(TXT, lines)
+    print("Sõnastik salvestatud!")
+        
 def init_dictionary():
-    default_words = {
-        "est": ["koer", "kass", "maja", "auto", "päike"], 
-        "rus": ["собака", "кошка", "дом", "машина", "солнце"], 
-        "eng": ["dog", "cat", "house", "car", "sun"]
-    }
-
-    for lang, lang_name in languages.items():
-        sonastik[lang] = []
-
-    for lang, words in default_words.items():
-        sonastik[lang] = words
+    global sonastik
+    sonastik = load_dict_file()
 
 def get_language_code_by_name(name: str):
     for lang, lang_name in languages.items():
@@ -74,7 +88,7 @@ def translate():
 
     print("Tõlkimine...")
     time.sleep(1)
-    print(f"Sõna {word} {languages[target_lang]}es on {translated_word}")
+    print(f"Sõna {word} {languages[target_lang]} keeles on {translated_word}")
 
 def translate_word(orig_lang: str, target_lang: str, word: str) -> str:
     if not orig_lang in languages:
@@ -120,7 +134,7 @@ def add_word_to_dict():
 
     for lang, lang_name in languages.items():
         while True:
-            word = get_input(str, f"Sisestage sõna {lang_name}es => ")
+            word = get_input(str, f"Sisestage sõna {lang_name} keeles => ")
             if is_word_correct_for_dict(word, lang):
                 words[lang] = word.strip().lower()
                 break
@@ -128,12 +142,14 @@ def add_word_to_dict():
     for lang, word in words.items():
         sonastik[lang].append(word)
 
+    save_dict_file()
+
 def correct_word():
     target_lang_input = get_input(str, "Sisestage keel => ")
     target_lang = get_language_code_by_name(target_lang_input)
 
     if not target_lang: 
-        print(f"Tundmatu keel [{target_lang_input}] !") 
+        print(f"Tundmatu keel [{target_lang_input}]!") 
         return
 
     word_to_correct = get_input(str, "Sisestage sõna, mida te soovite parandada => ")
@@ -142,9 +158,12 @@ def correct_word():
     if word_to_correct in words:
         while True:
             correct_word = get_input(str, "Sisestage parandatud sõna => ")
-            if is_word_correct_for_dict(correct_word):
+            if is_word_correct_for_dict(correct_word, target_lang):
                 sonastik[target_lang][words.index(word_to_correct)] = correct_word
+                save_dict_file()
                 break
+    else:
+        print("Sõna pole olemas!")
 
 def test_knowledge():
     orig_lang_input = get_input(str, "Sisestage esimene keel => ")

@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>06b023c2-f9e7-43ca-8925-678430473a32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Tund9.py</StartupFile>
+    <StartupFile>MainSonastik.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,10 +23,12 @@
   <ItemGroup>
     <Compile Include="ArvestusToo.py" />
     <Compile Include="BasicStructures.py" />
+    <Compile Include="EuroopaRiigid.py" />
     <Compile Include="IseseisevTöö1.py" />
     <Compile Include="KontrolltooKordused.py" />
     <Compile Include="MainSonastik.py" />
     <Compile Include="MangKiviPaberKaarid.py" />
+    <Compile Include="MainEuroopaRiigid.py" />
     <Compile Include="PraktilineToo2.py" />
     <Compile Include="PraktilineTooPalgad.py" />
     <Compile Include="PraktilineTooPalgad_Module.py" />
@@ -53,6 +55,7 @@
   <ItemGroup>
     <Content Include="funcs.txt" />
     <Content Include="riigid_pealinnad.txt" />
+    <Content Include="sonastik.txt" />
     <Content Include="Tund9.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

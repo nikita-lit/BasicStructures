@@ -1,0 +1,3 @@
+﻿est=koer,kass,maja,auto,päike,test
+rus=собака,кошка,дом,машина,солнце,тест
+eng=dog,cat,house,car,sun,tast
