@@ -20,9 +20,6 @@ TXT = "sonastik.txt"
 
 def load_dict_file():
     dictionary = {}
-    for lang in languages:
-        dictionary[lang] = []
-
     for line in read_file(TXT):
         lang, value = line.strip().split("=")
         words = value.split(",")
