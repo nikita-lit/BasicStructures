@@ -1,12 +1,19 @@
 # --------------------------------------
 
 import random
+from email.message import EmailMessage
+import smtplib
+import ssl
 
 # --------------------------------------
 
 USER_NAME = 0
 USER_PSW = 1
-USER_RIGHTS = 2
+USER_EMAIL = 2
+USER_RIGHTS = 3
+
+EMAIL = "nikitalitvinenko28@gmail.com"
+EMAIL_PSW = ""
 
 def get_input(data_type: type, text: str) -> any:
     """
@@ -98,3 +105,43 @@ def is_guest(user: list) -> bool:
     """
 
     return "guest" in user[USER_RIGHTS]
+
+def create_email_msg(subject: str, sender: str, receiver: str) -> EmailMessage:
+    message = EmailMessage()
+    message["Subject"] = subject
+    message["From"] = sender
+    message["To"] = receiver
+
+    return message
+
+def send_email(subject: str, receiver: str, content: str):
+    subject = subject
+    content = content
+    sender = EMAIL
+    password = EMAIL_PSW
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <head>
+    </head>
+        <body>
+            <h1>Sending an HTML email from Python</h1>
+            <p>{content}</p>
+            <a href="https://moodle.edu.ee/course/view.php?id=8327">Moodle</a>
+            <br>
+            <a href="https://github.com/nikita-lit">My Github</a>
+        </body>
+    </html>
+    """
+
+    message = create_email_msg(subject, sender, receiver)
+    message.set_content(html_content, subtype="html")
+
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls(context=ssl.create_default_context())
+            server.login(sender, password)
+            server.send_message(message)
+        print("Kiri saadetud!")
+    except Exception as e:
+        print(f"ERROR: {e}")

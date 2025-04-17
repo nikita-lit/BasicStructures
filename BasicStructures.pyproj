@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>06b023c2-f9e7-43ca-8925-678430473a32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MainSonastik.py</StartupFile>
+    <StartupFile>Tund8.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -56,6 +56,7 @@
     <Content Include="funcs.txt" />
     <Content Include="riigid_pealinnad.txt" />
     <Content Include="sonastik.txt" />
+    <Content Include="Tund8.txt" />
     <Content Include="Tund9.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
