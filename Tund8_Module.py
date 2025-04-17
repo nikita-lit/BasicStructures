@@ -13,7 +13,7 @@ USER_EMAIL = 2
 USER_RIGHTS = 3
 
 EMAIL = "nikitalitvinenko28@gmail.com"
-EMAIL_PSW = ""
+EMAIL_PSW = "" # aaaa aaaa aaaa aaaa
 
 def get_input(data_type: type, text: str) -> any:
     """
