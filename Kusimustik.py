@@ -137,7 +137,7 @@ def send_report_to_employer():
 
     content += best_result
 
-    send_email("Päeva tulemused", content, APP_EMAIL, APP_EMAIL)
+    send_email("Tulemuste aruanne", content, APP_EMAIL, APP_EMAIL)
 
 # --------------------------------------
 def add_new_question():
