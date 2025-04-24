@@ -136,6 +136,7 @@ def send_report_to_employer():
             best_result = f"Parim kandidaat: {name} ({score} punkti)\n"
 
     content += best_result
+    content += "Lugupidamisega,\nAutomaatne Testimissüsteem"
 
     send_email("Tulemuste aruanne", content, APP_EMAIL, APP_EMAIL)
 
