@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>06b023c2-f9e7-43ca-8925-678430473a32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Tund8.py</StartupFile>
+    <StartupFile>MainKusimustik.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -26,6 +26,8 @@
     <Compile Include="EuroopaRiigid.py" />
     <Compile Include="IseseisevTöö1.py" />
     <Compile Include="KontrolltooKordused.py" />
+    <Compile Include="Kusimustik.py" />
+    <Compile Include="MainKusimustik.py" />
     <Compile Include="MainSonastik.py" />
     <Compile Include="MangKiviPaberKaarid.py" />
     <Compile Include="MainEuroopaRiigid.py" />
@@ -54,6 +56,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="funcs.txt" />
+    <Content Include="kusimused.txt" />
+    <Content Include="osalejad.txt" />
     <Content Include="riigid_pealinnad.txt" />
     <Content Include="sonastik.txt" />
     <Content Include="Tund8.txt" />
