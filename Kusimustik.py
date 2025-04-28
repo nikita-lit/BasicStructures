@@ -144,7 +144,7 @@ def send_report_to_employer():
 def add_new_question():
     question = get_input(str, "Sisestage uus küsimus => ")
     answer = get_input(str, "Sisestage õige vastus => ")
-    questions.append({question: answer})
+    questions[question] = answer
     save_questions()
 
 # --------------------------------------

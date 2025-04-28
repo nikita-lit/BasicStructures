@@ -50,14 +50,14 @@ plt.plot(x, y, color="blue", linestyle="-", marker="D", markersize=8)
 
 x = np.arange(-9, -6, 0.01)
 y = -(x+7)**2 + 5
-plt.plot(x, y, color="blue", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="black", linestyle="-", marker="D", markersize=8)
 
 x= np.arange(6, 9, 0.01)
 y = -(x-7)**2 + 5
-plt.plot(x, y, color="blue", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="black", linestyle="-", marker="D", markersize=8)
 
 x = np.arange(-1, 1, 0.01)
 y = -0.5*x**2 + 1.5
-plt.plot(x, y, color="blue", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="red", linestyle="-", marker="D", markersize=8)
 
 plt.show()
