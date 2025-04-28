@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>06b023c2-f9e7-43ca-8925-678430473a32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MainKusimustik.py</StartupFile>
+    <StartupFile>Tund10.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>

@@ -32,32 +32,32 @@ plt.xlabel("x telg")
 plt.ylabel("y telg")
 plt.grid(True)
 
-x = np.arange(-9, -1, 0.01)
+x = np.arange(-9, -1, 0.1)
 y = -(1/16)*(x+5)**2 + 2
-plt.plot(x, y, color="blue", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="darkblue", linestyle="-", marker=".", markersize=12)
 
-x = np.arange(1, 9, 0.01)
+x = np.arange(1, 9, 0.1)
 y = -(1/16)*(x-5)**2 + 2
-plt.plot(x, y, color="blue", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="darkblue", linestyle="-", marker=".", markersize=12)
 
-x = np.arange(-9, -1, 0.01)
+x = np.arange(-9, -1, 0.1)
 y = (1/4)*(x+5)**2 - 3
-plt.plot(x, y, color="blue", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="darkblue", linestyle="-", marker=".", markersize=12)
 
-x = np.arange(1, 9, 0.01)
+x = np.arange(1, 9, 0.1)
 y = (1/4)*(x-5)**2 - 3
-plt.plot(x, y, color="blue", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="darkblue", linestyle="-", marker=".", markersize=12)
 
-x = np.arange(-9, -6, 0.01)
+x = np.arange(-9, -6, 0.1)
 y = -(x+7)**2 + 5
-plt.plot(x, y, color="black", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="darkblue", linestyle="-", marker=".", markersize=12)
 
-x= np.arange(6, 9, 0.01)
+x= np.arange(6, 9, 0.1)
 y = -(x-7)**2 + 5
-plt.plot(x, y, color="black", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="darkblue", linestyle="-", marker=".", markersize=12)
 
-x = np.arange(-1, 1, 0.01)
+x = np.arange(-1, 1, 0.1)
 y = -0.5*x**2 + 1.5
-plt.plot(x, y, color="red", linestyle="-", marker="D", markersize=8)
+plt.plot(x, y, color="darkblue", linestyle="-", marker=".", markersize=12)
 
 plt.show()
