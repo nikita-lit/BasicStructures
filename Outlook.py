@@ -8,6 +8,7 @@ import smtplib
 from email.message import EmailMessage
 import ssl
 import json
+import datetime as dt
 
 # --------------------------------------
 
@@ -20,20 +21,26 @@ entry_to = None
 text_area = None
 file_list = None
 attached_files = []
+but_letter_frame = None
+
+cur_letter = {}
+cur_letter_readonly = False
 
 # settings
 entry_app_email = None
 entry_app_password = None
-selected_theme = None
+#selected_theme = None
 
 app_drafts = {}
+app_logs = {}
 
-THEME_BLACK = "Must"
-THEME_WHITE = "Valge"
+#THEME_BLACK = "Must"
+#THEME_WHITE = "Valge"
 
 app_password = ""
 app_email = ""
-app_theme = THEME_BLACK
+SSL_PORT = 465
+#app_theme = THEME_BLACK
 
 TXT_SETTING = "outlook_settings.json"
 TXT_DRAFTS = "outlook_drafts.json"
@@ -51,11 +58,13 @@ TBB_FG = "white"
 
 def on_close():
     save_draft_letter()
+    save_logs()
     window.destroy() 
 
 def create_window():
     load_settings()
     load_draft_letters()
+    load_logs()
 
     global window, main_area
 
@@ -78,7 +87,7 @@ def create_window():
 
     window.mainloop()
 
-def send_letter():
+def send_letter(insert: bool = True):
     set_cur_option(0)
     for widget in main_area.winfo_children():
         widget.destroy()
@@ -97,7 +106,7 @@ def send_letter():
     
     entry_to = tk.Entry(frame_to, bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 16))
     entry_to.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=True)
-
+    
     # --------------------------------------
     # theme
     frame_theme = tk.Frame(send_letter_frame, bg=MAIN_BG, height=20)
@@ -138,39 +147,66 @@ def send_letter():
 
     # --------------------------------------
     # buttons (send, attach)
-    but_frame = tk.Frame(send_letter_frame, bg=MAIN_BG, height=20)
-    but_frame.pack(fill=tk.BOTH, side=tk.BOTTOM)
+    global but_letter_frame
+    but_letter_frame = tk.Frame(send_letter_frame, bg=MAIN_BG, height=20)
+    but_letter_frame.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
-    but_send = tk.Button(but_frame, text="Saada kiri", command=cmd_send_email, bg=TITLE_BG, fg=TITLE_FG, font=("TkDefaultFont", 16), relief=tk.FLAT)
+    but_send = tk.Button(but_letter_frame, text="Saada kiri", command=cmd_send_email, bg=TITLE_BG, fg=TITLE_FG, font=("TkDefaultFont", 16), relief=tk.FLAT)
     but_send.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=True)
 
-    but_attach = tk.Button(but_frame, text="Lisa fail", command=cmd_attach_file, width=10, bg=TITLE_BG, fg=TITLE_FG, font=("TkDefaultFont", 16), relief=tk.FLAT)
+    but_attach = tk.Button(but_letter_frame, text="Lisa fail", command=cmd_attach_file, width=10, bg=TITLE_BG, fg=TITLE_FG, font=("TkDefaultFont", 16), relief=tk.FLAT)
     but_attach.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=False)
 
-    but_clear = tk.Button(but_frame, text="Puhasta", width=7, command=cmd_clear, bg=TBB_BG, fg=TITLE_FG, font=("TkDefaultFont", 16), relief=tk.FLAT)
+    but_clear = tk.Button(but_letter_frame, text="Puhasta", width=7, command=cmd_clear, bg=TBB_BG, fg=TITLE_FG, font=("TkDefaultFont", 16), relief=tk.FLAT)
     but_clear.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=False)
+
+    if insert and cur_letter and not cur_letter_readonly:
+        insert_letter(cur_letter)
+
+def disable_buttons():
+    global cur_letter_readonly
+    cur_letter_readonly = True
+    for widget in but_letter_frame.winfo_children():
+        widget.destroy()
 
 def drafts():
     set_cur_option(1)
     for widget in main_area.winfo_children():
         widget.destroy()
 
-    for name, data in app_drafts.items():
-        but_open = tk.Button(main_area, text="Ava "+name, command=lambda: open_draft_letter(data), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 16), relief=tk.FLAT)
-        but_open.pack(padx=5, pady=5, fill="x", side=tk.TOP, expand=False)
-    
-
+    for draft_date, draft in app_drafts.items():    
+        but_frame = tk.Frame(main_area, bg=TBB_BG_H, height=20)
+        but_frame.pack(padx=5, pady=5, fill=tk.BOTH, side=tk.TOP, expand=False)
+        
+        date = dt.datetime.strptime(draft_date, "%Y-%m-%d %H:%M:%S.%f")
+        but_open = tk.Button(but_frame, text="Ava ["+draft["subject"]+"]    "+date.strftime("%m/%d/%y %H:%M:%S"), command=lambda draft=draft: open_letter(draft), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 12), relief=tk.FLAT)
+        but_open.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=True)
+        
+        but_delete = tk.Button(but_frame, text="Kustuta", command=lambda draft_date=draft_date: delete_draft(draft_date), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 12), relief=tk.FLAT)
+        but_delete.pack(padx=5, pady=5, fill="x", side=tk.RIGHT, expand=False)
+        
 def inbox():
     set_cur_option(2)
     for widget in main_area.winfo_children():
         widget.destroy()
+        
+    for letter_date, letter in app_logs.items():    
+        but_frame = tk.Frame(main_area, bg=TBB_BG_H, height=20)
+        but_frame.pack(padx=5, pady=5, fill=tk.BOTH, side=tk.TOP, expand=False)
+        
+        date = dt.datetime.strptime(letter_date, "%Y-%m-%d %H:%M:%S.%f")
+        but_open = tk.Button(but_frame, text="Ava ["+letter["subject"]+"]    "+date.strftime("%m/%d/%y %H:%M:%S")+" "+(letter["sent"] and "Toimetatud" or "Ei toimetatud"), command=lambda letter=letter: open_letter(letter, True), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 12), relief=tk.FLAT)
+        but_open.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=True)
+        
+        but_delete = tk.Button(but_frame, text="Kustuta", command=lambda letter_date=letter_date: delete_log_letter(letter_date), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 12), relief=tk.FLAT)
+        but_delete.pack(padx=5, pady=5, fill="x", side=tk.RIGHT, expand=False)
 
 def settings():
     set_cur_option(3)
     for widget in main_area.winfo_children():
         widget.destroy()
 
-    global entry_app_email, entry_app_password, selected_theme
+    global entry_app_email, entry_app_password#, selected_theme
 
     # --------------------------------------
     # email
@@ -207,32 +243,31 @@ def settings():
 
     # --------------------------------------
     # theme color
+    # frame_theme_color = tk.Frame(main_area, bg=MAIN_BG, height=20)
+    # frame_theme_color.pack(fill=tk.BOTH, side=tk.TOP, expand=False)
 
-    frame_theme_color = tk.Frame(main_area, bg=MAIN_BG, height=20)
-    frame_theme_color.pack(fill=tk.BOTH, side=tk.TOP, expand=False)
+    # label_theme_color = tk.Label(frame_theme_color, text="Teema värv", bg=TITLE_BG, fg=TITLE_FG, width=10, font=("TkHeadingFont", 16))
+    # label_theme_color.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=False)
 
-    label_theme_color = tk.Label(frame_theme_color, text="Teema värv", bg=TITLE_BG, fg=TITLE_FG, width=10, font=("TkHeadingFont", 16))
-    label_theme_color.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=False)
+    # options = ["Must", "Valge"]
+    # selected_theme = tk.StringVar(value=options[0])
+    # selected_theme.set(app_theme)
 
-    options = ["Must", "Valge"]
-    selected_theme = tk.StringVar(value=options[0])
-    selected_theme.set(app_theme)
-
-    dropdown = tk.OptionMenu(frame_theme_color, selected_theme, *options)
-    dropdown.config(bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 16), 
-                    width=10, height=1, 
-                    relief=tk.FLAT, 
-                    activebackground=TBB_BG_H, 
-                    activeforeground=TBB_FG, 
-                    highlightthickness=2,
-                    highlightbackground=TB_BG)
-    dropdown["menu"].config(
-        bg=TBB_BG,
-        fg=TBB_FG,
-        activebackground="steelblue",
-        activeforeground=TBB_FG,
-    )
-    dropdown.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=False)
+    # dropdown = tk.OptionMenu(frame_theme_color, selected_theme, *options)
+    # dropdown.config(bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 16), 
+    #                 width=10, height=1, 
+    #                 relief=tk.FLAT, 
+    #                 activebackground=TBB_BG_H, 
+    #                 activeforeground=TBB_FG, 
+    #                 highlightthickness=2,
+    #                 highlightbackground=TB_BG)
+    # dropdown["menu"].config(
+    #     bg=TBB_BG,
+    #     fg=TBB_FG,
+    #     activebackground="steelblue",
+    #     activeforeground=TBB_FG,
+    # )
+    # dropdown.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=False)
 
     # --------------------------------------
     # save
@@ -247,7 +282,7 @@ def save_settings():
     settings = {
         "email": entry_app_email.get(),
         "password": entry_app_password.get(),
-        "theme_color": selected_theme.get(),
+        #"theme_color": selected_theme.get(),
     }
 
     with open(TXT_SETTING, "w") as file:
@@ -256,29 +291,30 @@ def save_settings():
     messagebox.showinfo("Info", "Seaded salvestatud!")
 
 def load_settings():
-    global app_email, app_password, app_theme
+    global app_email, app_password#, app_theme
 
     try:
         with open(TXT_SETTING, "r") as file:
             settings = json.load(file)
             app_email = settings["email"]
             app_password = settings["password"]
-            app_theme = settings["theme_color"]
+            #app_theme = settings["theme_color"]
     except:
         pass
 
 def cmd_send_email():
     global app_email, app_password
 
-    to = entry_to.get()
-    subject = entry_theme.get()
-    body = text_area.get("1.0", tk.END)
-
+    save_cur_letter()
+    to = cur_letter["to"]
+    subject = cur_letter["subject"]
+    body = cur_letter["body"]
+    
     if not to or not subject or not body:
         messagebox.showwarning("Hoiatus", "Palun täitke kõik väljad.")
         return
     
-    emails = to.split(",")
+    emails = cur_letter["to"].strip().split(",")
     for email in emails:
         email = email.strip()
         if not email:
@@ -287,27 +323,35 @@ def cmd_send_email():
             messagebox.showwarning("Hoiatus", f"Vale e-posti aadress: {email}")
             return
 
-    messagebox.showinfo("Info", "Kiri saadetud.")
-    # try:
-    #     message = EmailMessage()
-    #     message["Subject"] = subject
-    #     message["From"] = app_email
-    #     message["To"] = subject
-    #     message.set_content(body)
+    try:
+        message = EmailMessage()
+        message["Subject"] = subject
+        message["From"] = app_email
+        message["To"] = subject
+        message.set_content(body)
 
-    #     with smtplib.SMTP_SSL("smtp.gmail.com", 587) as server:
-    #         server.starttls(context=ssl.create_default_context())
-    #         server.login(app_email, app_password)
-    #         server.send_message(message)
-    #         messagebox.showinfo("Info", "Kiri saadetud.")
-    # except Exception as e:
-    #     messagebox.showerror("Viga", e)
+        with smtplib.SMTP_SSL("smtp.gmail.com", SSL_PORT) as server:
+            server.starttls(context=ssl.create_default_context())
+            server.login(app_email, app_password)
+            server.send_message(message)
+            messagebox.showinfo("Info", "Kiri saadetud.")
+            cur_letter["sent"] = True
+    except Exception as e:
+        messagebox.showerror("Viga", e)
+        cur_letter["sent"] = False
+
+    for draft_date, draft in app_drafts.items():
+        if draft["to"].lower() == cur_letter["to"].lower() and draft["subject"].lower() == cur_letter["subject"].lower():
+            delete_draft(draft_date)
+            break
+    
+    log_letter(cur_letter)
+    cmd_clear()
 
 def cmd_attach_file():
     file_path = filedialog.askopenfilename()
     if file_path and file_list:
         attached_files.append(file_path)
-        files = ", ".join(attached_files)
         file_list.insert(tk.END, file_path)
 
 def cmd_clear():
@@ -322,14 +366,20 @@ def save_draft_letter():
     try:
         if not entry_to.get() or not entry_theme.get() or not text_area.get("1.0", tk.END):
             return
-        
+    
+        date = str(dt.datetime.now())
+        for draft in app_drafts.values():
+            if draft["to"] == entry_to.get() and draft["subject"] == entry_theme.get():
+                date = draft["date"]
+
         new_draft = {
             "to": entry_to.get(),
             "subject": entry_theme.get(),
             "body": text_area.get("1.0", tk.END),
-            "attachments": attached_files
+            "attachments": attached_files,
+            "date": date,
         }
-        app_drafts[entry_theme.get()] = new_draft
+        app_drafts[date] = new_draft
 
         with open(TXT_DRAFTS, "w") as file:
             json.dump(app_drafts, file)
@@ -343,16 +393,96 @@ def load_draft_letters():
             app_drafts = json.load(file)
     except:
         pass
- 
-def open_draft_letter(data):
-    send_letter()
-    entry_to.insert(0, data["to"])
-    entry_theme.insert(0, data["subject"])
-    text_area.insert("1.0", data["body"])
-    attached_files = data["attachments"]
+    
+def delete_draft(date):
+    if date in app_drafts:
+        app_drafts.pop(date)
+        with open(TXT_DRAFTS, "w") as file:
+            json.dump(app_drafts, file)
+        drafts()
+    else:
+        messagebox.showerror("Viga", "Mustandit ei leitud.")
+
+def delete_log_letter(date):
+    if date in app_logs:
+        app_logs.pop(date)
+        with open(TXT_LOG, "w") as file:
+            json.dump(app_logs, file)
+        inbox()
+    else:
+        messagebox.showerror("Viga", "Log fail ei leitud.")
+
+
+# --------------------------------------
+def load_logs():
+    global app_logs
+    try:
+        with open(TXT_LOG, "r") as file:
+            app_logs = json.load(file)
+    except:
+        return []
+
+def log_letter(data):
+    data["date"] = str(dt.datetime.now())
+    
+    try:
+        app_logs[data["date"]] = data
+
+        with open(TXT_LOG, "a") as file:
+            json.dump(app_logs, file)
+    except:
+        pass
+    
+def save_logs():
+    try:
+        with open(TXT_LOG, "w") as file:
+            json.dump(app_logs, file)
+    except:
+        pass
+
+# --------------------------------------
+def save_cur_letter():
+    if cur_letter_readonly:
+        return
+    
+    if not entry_to or not entry_theme or not text_area:
+        return
+
+    global cur_letter
+
+    text = text_area.get("1.0", tk.END)
+    if text == "\n":
+        text = ""
+
+    letter = {
+        "to": entry_to.get(),
+        "subject": entry_theme.get(),
+        "body": text,
+        "attachments": attached_files
+    }
+    cur_letter = letter
+
+def open_letter(data: dict, onlyRead: bool = False):
+    if not data:
+        return
+
+    if cur_option != 0:
+        send_letter(False)
+        if onlyRead:
+            disable_buttons()
+        
+    insert_letter(data)
+
+def insert_letter(data_to_insert: dict):
+    if not data_to_insert:
+        return
+
+    entry_to.insert(0, data_to_insert["to"])
+    entry_theme.insert(0, data_to_insert["subject"])
+    text_area.insert("1.0", data_to_insert["body"])
+    attached_files = data_to_insert["attachments"]
     for file in attached_files:
         file_list.insert(tk.END, file)
-    
 
 # --------------------------------------
 def on_enter(event):
@@ -373,8 +503,14 @@ def set_cur_option(index):
     global cur_option
     if cur_option == 0:
         save_draft_letter()
+        save_cur_letter()
 
     cur_option = index
+
+def open_taskbar(option):
+    global cur_letter_readonly
+    eval(option[1]+"()")
+    cur_letter_readonly = False
 
 def create_taskbar():
     taskbar = tk.Frame(window, bg=TB_BG, width=250)
@@ -385,7 +521,7 @@ def create_taskbar():
     label_name.pack(padx=5, pady=5, fill="x")
 
     for option in taskbar_options:
-        but_1 = tk.Button(taskbar, text=option[0], command=eval(option[1]), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 16), anchor='w', relief=tk.FLAT)
+        but_1 = tk.Button(taskbar, text=option[0], command=lambda option=option: open_taskbar(option), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 16), anchor='w', relief=tk.FLAT)
         but_1.pack(padx=5, pady=5, fill="x")
         but_1.bind("<Enter>", on_enter)
         but_1.bind("<Leave>", on_leave)
