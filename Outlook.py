@@ -9,6 +9,7 @@ from email.message import EmailMessage
 import ssl
 import json
 import datetime as dt
+import os
 
 # --------------------------------------
 
@@ -33,13 +34,13 @@ entry_app_password = None
 
 app_drafts = {}
 app_logs = {}
+app_logs2 = {}
 
 #THEME_BLACK = "Must"
 #THEME_WHITE = "Valge"
 
 app_password = ""
 app_email = ""
-SSL_PORT = 465
 #app_theme = THEME_BLACK
 
 TXT_SETTING = "outlook_settings.json"
@@ -58,7 +59,6 @@ TBB_FG = "white"
 
 def on_close():
     save_draft_letter()
-    save_logs()
     window.destroy() 
 
 def create_window():
@@ -174,6 +174,7 @@ def drafts():
     for widget in main_area.winfo_children():
         widget.destroy()
 
+    global app_drafts
     for draft_date, draft in app_drafts.items():    
         but_frame = tk.Frame(main_area, bg=TBB_BG_H, height=20)
         but_frame.pack(padx=5, pady=5, fill=tk.BOTH, side=tk.TOP, expand=False)
@@ -189,13 +190,14 @@ def inbox():
     set_cur_option(2)
     for widget in main_area.winfo_children():
         widget.destroy()
-        
-    for letter_date, letter in app_logs.items():    
+    
+    global app_logs2
+    for letter_date, letter in app_logs2.items():    
         but_frame = tk.Frame(main_area, bg=TBB_BG_H, height=20)
         but_frame.pack(padx=5, pady=5, fill=tk.BOTH, side=tk.TOP, expand=False)
         
         date = dt.datetime.strptime(letter_date, "%Y-%m-%d %H:%M:%S.%f")
-        but_open = tk.Button(but_frame, text="Ava ["+letter["subject"]+"]    "+date.strftime("%m/%d/%y %H:%M:%S")+" "+(letter["sent"] and "Toimetatud" or "Ei toimetatud"), command=lambda letter=letter: open_letter(letter, True), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 12), relief=tk.FLAT)
+        but_open = tk.Button(but_frame, text="Ava ["+letter["subject"]+"]    "+date.strftime("%m/%d/%y %H:%M:%S")+" ["+(letter["sent"] and "Toimetatud" or "Ei toimetatud") + "]", command=lambda letter=letter: open_letter(letter, True), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 12), relief=tk.FLAT)
         but_open.pack(padx=5, pady=5, fill="x", side=tk.LEFT, expand=True)
         
         but_delete = tk.Button(but_frame, text="Kustuta", command=lambda letter_date=letter_date: delete_log_letter(letter_date), bg=TBB_BG, fg=TBB_FG, font=("TkDefaultFont", 12), relief=tk.FLAT)
@@ -323,29 +325,43 @@ def cmd_send_email():
             messagebox.showwarning("Hoiatus", f"Vale e-posti aadress: {email}")
             return
 
+    error = False
     try:
         message = EmailMessage()
         message["Subject"] = subject
         message["From"] = app_email
-        message["To"] = subject
+        message["To"] = to
         message.set_content(body)
+        
+        for file in cur_letter["attachments"]:
+            if not os.path.exists(file):
+                messagebox.showwarning("Hoiatus", f"Faili ei leitud: {file}")
+                return
+            
+            with open(file, "rb") as f:
+                    file_content = f.read()
+                    file_name = file.split("/")[-1]
+                    message.add_attachment(file_content, maintype="application", subtype="octet-stream", filename=file_name)
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", SSL_PORT) as server:
-            server.starttls(context=ssl.create_default_context())
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as server:
             server.login(app_email, app_password)
             server.send_message(message)
-            messagebox.showinfo("Info", "Kiri saadetud.")
-            cur_letter["sent"] = True
+
+        error = False
+        messagebox.showinfo("Info", "Kiri saadetud.")
     except Exception as e:
         messagebox.showerror("Viga", e)
-        cur_letter["sent"] = False
-
-    for draft_date, draft in app_drafts.items():
-        if draft["to"].lower() == cur_letter["to"].lower() and draft["subject"].lower() == cur_letter["subject"].lower():
-            delete_draft(draft_date)
-            break
-    
+        error = True
+        
+    cur_letter["sent"] = not error
     log_letter(cur_letter)
+    
+    if not error:
+        for draft_date, draft in app_drafts.items():
+            if draft["to"].lower() == cur_letter["to"].lower() and draft["subject"].lower() == cur_letter["subject"].lower():
+                delete_draft(draft_date)
+                break
+
     cmd_clear()
 
 def cmd_attach_file():
@@ -363,6 +379,9 @@ def cmd_clear():
 
 # --------------------------------------
 def save_draft_letter():
+    if cur_letter_readonly:
+        return
+    
     try:
         if not entry_to.get() or not entry_theme.get() or not text_area.get("1.0", tk.END):
             return
@@ -404,6 +423,7 @@ def delete_draft(date):
         messagebox.showerror("Viga", "Mustandit ei leitud.")
 
 def delete_log_letter(date):
+    global app_logs, app_logs2
     if date in app_logs:
         app_logs.pop(date)
         with open(TXT_LOG, "w") as file:
@@ -411,34 +431,32 @@ def delete_log_letter(date):
         inbox()
     else:
         messagebox.showerror("Viga", "Log fail ei leitud.")
+    app_logs2 = app_logs
 
 
 # --------------------------------------
 def load_logs():
-    global app_logs
+    global app_logs, app_logs2
     try:
         with open(TXT_LOG, "r") as file:
             app_logs = json.load(file)
     except:
-        return []
+        pass
+    app_logs2 = app_logs
 
 def log_letter(data):
-    data["date"] = str(dt.datetime.now())
-    
+    global app_logs
     try:
+        data["date"] = str(dt.datetime.now())
+        data["attachments"] = attached_files
         app_logs[data["date"]] = data
-
-        with open(TXT_LOG, "a") as file:
-            json.dump(app_logs, file)
-    except:
-        pass
-    
-def save_logs():
-    try:
         with open(TXT_LOG, "w") as file:
             json.dump(app_logs, file)
     except:
         pass
+    
+    global app_logs2
+    app_logs2 = app_logs
 
 # --------------------------------------
 def save_cur_letter():
@@ -458,7 +476,7 @@ def save_cur_letter():
         "to": entry_to.get(),
         "subject": entry_theme.get(),
         "body": text,
-        "attachments": attached_files
+        "attachments": attached_files,
     }
     cur_letter = letter
 
@@ -470,7 +488,7 @@ def open_letter(data: dict, onlyRead: bool = False):
         send_letter(False)
         if onlyRead:
             disable_buttons()
-        
+    
     insert_letter(data)
 
 def insert_letter(data_to_insert: dict):
