@@ -4,6 +4,7 @@
 
 import tkinter as tk
 import random
+import time
 from PIL import Image, ImageTk
 
 # --------------------------------------
@@ -72,7 +73,7 @@ def create_window():
     global window, main_frame
     
     window = tk.Tk()
-    window.title("Mang")
+    window.title("Mang21")
     window.resizable(width=False, height=False)
     window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
     window.iconbitmap("icon.ico")
@@ -129,6 +130,7 @@ def create_table():
         create_player(num)
     
     create_dealer()
+    update_score()
 
     global but_start
     but_start = tk.Button(tbl_canvas, text="Alusta", command=lambda: start_game())
@@ -174,79 +176,168 @@ def create_dealer():
         text="Diiler", font=("Arial", 16), fill="white")
     
 def create_buttons():
-    global players, cur_player, tbl_canvas, arrow, but_get_card, but_stay
-
-    if arrow:
-        tbl_canvas.delete(arrow)
-        but_get_card.destroy()
-        but_stay.destroy()
+    global tbl_canvas, players, cur_player, but_get_card, but_stay
+    
+    delete_buttons()
 
     pos = players[cur_player]["pos"]
 
     but_get_card = tk.Button(tbl_canvas, text="Võta kaart", command=lambda: get_card())
     but_get_card.config(bg="white", fg="black", font=("Arial", 14))
-    but_get_card.place(x=(WINDOW_WIDTH/2)-(120/2)-80, y=WINDOW_HEIGHT-40, width=120, height=30)
+    but_get_card.place(x=(WINDOW_WIDTH/2)-(120/2), y=170, width=120, height=30)
 
     but_stay = tk.Button(tbl_canvas, text="Ära võta", command=lambda: stay())
     but_stay.config(bg="white", fg="black", font=("Arial", 14))
-    but_stay.place(x=(WINDOW_WIDTH/2)-(120/2)+80, y=WINDOW_HEIGHT-40, width=120, height=30)
+    but_stay.place(x=(WINDOW_WIDTH/2)-(120/2), y=WINDOW_HEIGHT-40, width=120, height=30)
+    
+def delete_buttons():
+    global tbl_canvas, arrow, but_get_card, but_stay
 
+    if but_get_card:
+        but_get_card.destroy()
+        but_stay.destroy()
+        
+def create_arrow():
+    global tbl_canvas, players, cur_player, arrow
+    
+    pos = players[cur_player]["pos"]
+    
+    if arrow:
+        tbl_canvas.delete(arrow)
+    
     arrow = tbl_canvas.create_text(
         pos[0],
-        pos[1]+30,
+        pos[1]+40,
         text="↑", font=("Arial", 26), fill="white")
     
-def create_card(num: int):
-    global tbl_canvas, players, cur_player
+def create_card(cards: dict, player_num: int):
+    global tbl_canvas, players
     
-    img = Image.open(f"mang21/images/cards/{num}.png")
-    img = img.resize((40, 60), 1)
-    tk_image = ImageTk.PhotoImage(img)
+    for card_p in players[player_num]["cards_p"]:
+        card_p["panel"].destroy()
+    
+    players[player_num]["cards_p"].clear()
+    
+    vertical_offset = 0
+    horizontal_offset = 0
+    card_width = 40
+    card_height = 50
+    spacing = 35
+    cards_in_row = 0
+    max_cards_per_row = 6
+    
+    for key, card in enumerate(cards):
+        img = Image.open(f"mang21/images/cards/{card}.png")
+        img = img.resize((card_width, card_height), 1)
+        tk_image = ImageTk.PhotoImage(img)
 
-    player_pos = players[cur_player]["pos"]
-    pos = (player_pos[0], player_pos[1]-50)
+        player_pos = players[player_num]["pos"]
+        pos = (player_pos[0] + 50 + horizontal_offset, player_pos[1] - 220 - vertical_offset)
+        
+        card_panel = tk.Frame(tbl_canvas, bg="white", bd=2, relief=tk.RAISED)
+        card_panel.place(x=pos[0], y=pos[1])
 
-    #card_panel = tbl_canvas.create_rectangle(50, 70, 0, 0, fill="white", outline="black")
-    #card_image = tbl_canvas.create_image(pos[0]-5, pos[1]-5, image=tk_image, anchor=tk.NW)
+        card_image = tk.Label(card_panel, image=tk_image, bg="white")
+        card_image.pack()
 
-    card = {
-        "card": num,
-        "pos": ((WINDOW_WIDTH/2)-(100/2), 0),
-        "panel": card_panel,
-        "img": tk_image,
-        "image": card_image,
-    }
+        card_name = tk.Label(card_panel, text=card, bg="white", font=("Arial", 10))
+        card_name.pack()
 
-    players[cur_player]["cards"].append(card)
+        card_p = {
+            "card": card,
+            "pos": (pos[0], pos[1]),
+            "panel": card_panel,
+            "img": tk_image,
+        }
+
+        players[player_num]["cards_p"].append(card_p)
+
+        cards_in_row += 1
+
+        if cards_in_row >= max_cards_per_row:
+            vertical_offset = 0
+            horizontal_offset -= card_width + spacing
+            cards_in_row = 0
+        else:
+            vertical_offset += card_height + spacing
+
+scores_texts = []
+
+def update_score():
+    global players, scores_texts, tbl_canvas
+    
+    for text in scores_texts:
+        tbl_canvas.delete(text)
+    
+    for key, data in players.items():
+        score = count_points(data["cards"])
+        players[key]["score"] = score
+        
+        if data["isbot"]:
+            score = "?"
+        
+        pos = data["pos"]
+        text = tbl_canvas.create_text(
+            pos[0],
+            pos[1] + 20,
+            text=f"Skoor: {score}", font=("Arial", 12), fill="white")
+        
+        scores_texts.append(text)
+    
 
 # --------------------------------------
 # game
 
 def start_game():
-    global game_started, cur_player, but_start
+    global game_started, cur_player, but_start, players
     
     if not game_started:
         game_started = True
 
     but_start.destroy()
-    cur_player = 0
+    next_player()
+    
+def ask_player():
+    if players[cur_player]["isbot"]:
+        window.after(2000, bot_turn)
+    else:
+        create_buttons()
 
-    create_buttons()
+
+def bot_turn():
+    bot_cards = players[cur_player]["cards"]
+    bot_score = count_points(bot_cards)
+
+    if bot_score < 17:
+        get_card()
+    elif bot_score >= 17 and bot_score < 21:
+        if random.randint(0, 100) < 30:
+            get_card()
+        else:
+            stay()
+    else:
+        stay()
 
 def get_card():
     global cur_player, players
     
     player = players[cur_player]
+    cards = list(CARDS.keys())
+    
     if player["isbot"]:
-        player["cards"] = [random.choice(list(CARDS.keys()))]
-        create_card(player["cards"][0])
-        pass
+        player["cards"].append(random.choice(cards))
+        create_card(player["cards"], cur_player)
+        update_score()
     else:
-        player["cards"] = [random.choice(list(CARDS.keys()))]
-        create_card(player["cards"][0])
-        pass
+        player["cards"].append(random.choice(cards))
+        create_card(player["cards"], cur_player)
+        update_score()
+        
+    delete_buttons()
+    next_player()
 
 def stay():
+    delete_buttons()
     next_player()
 
 def next_player():
@@ -257,14 +348,15 @@ def next_player():
     else:
         cur_player = 0
 
-    create_buttons()
+    create_arrow()
+    ask_player()
 
 # --------------------------------------
 def register_player(num: int, name: str, isBot: bool):
     global players
     
     if len(players) < PLAYER_NUM:
-        players[num] = {"isbot": isBot, "name": name, "score": 0, "cards": []}
+        players[num] = {"isbot": isBot, "name": name, "score": 0, "cards": [], "cards_p": []}
         return True
     else:
         return False
