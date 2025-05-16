@@ -3,22 +3,67 @@
 # --------------------------------------
 
 import tkinter as tk
+import random
 from PIL import Image, ImageTk
 
 # --------------------------------------
-
 window = None
 main_frame = None
 tbl_canvas = None
-players = {}
 
+but_start = None
+
+arrow = None
+but_get_card = None
+but_stay = None
+
+# --------------------------------------
+# game
+players = {}
+game_started = False
+cur_player = -1
+
+# --------------------------------------
+# consts
 PLAYER_NUM = 5
 BOT_COUNT = (PLAYER_NUM-1)
 MAN_FACE_SIZE = (128, 128)
 
-WINDOW_WIDTH = 1100
-WINDOW_HEIGHT = 600
+WINDOW_WIDTH = 1280
+WINDOW_HEIGHT = 800
 DISTANCE_BETWEEN_PLAYERS = WINDOW_WIDTH / PLAYER_NUM
+
+# --------------------------------------
+# cards 
+
+CARDS = {
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9,
+    "10": 10,
+    "J": 10,
+    "Q": 10,
+    "K": 10,
+    "A": 11,
+}
+
+def count_points(cards):
+    points = 0
+    aces = 0
+    for card in cards:
+        points += CARDS[card]
+        if card == 'A':
+            aces += 1
+    while points > 21 and aces:
+        points -= 10
+        aces -= 1
+    return points
+
 # --------------------------------------
 def on_close():
     window.destroy() 
@@ -37,28 +82,29 @@ def create_window():
     main_frame = tk.Frame(window)
     main_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
     
-    create_menu()
-    #create_table()
-    
-    #canvas = tk.Canvas(window, width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
-    #canvas.pack()
-    
-    #image = tk.PhotoImage(file="mang21/images/cat1.png")
-    #circle = canvas.create_image(0, 0, anchor=tk.NW, image=image)
+    #create_menu()
+    create_table()
     
     window.mainloop()
     
 def create_menu():
-    frame_menu = tk.Frame(main_frame)
-    frame_menu.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
+    global tbl_canvas
+    tbl_canvas = tk.Canvas(main_frame, width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
+    tbl_canvas.pack()
+
+    img = Image.open("mang21/images/wallpaper.png")
+    img = img.resize((WINDOW_WIDTH, WINDOW_HEIGHT), 1)
+    tk_image = ImageTk.PhotoImage(img)
+
+    tbl_canvas.create_image(0, 0, image=tk_image, anchor=tk.NW)
+    tbl_canvas.table_img = tk_image
     
     width, height = 250, 60
-
-    but_start = tk.Button(frame_menu, text="Alusta", command=create_table)
+    but_start = tk.Button(tbl_canvas, text="Alusta", command=create_table)
     but_start.config(bg="green", fg="white")
     but_start.place(x=(WINDOW_WIDTH/2)-(width/2), y=(WINDOW_HEIGHT/2), width=width, height=height)
     
-    but_exit = tk.Button(frame_menu, text="Välju", command=on_close)
+    but_exit = tk.Button(tbl_canvas, text="Välju", command=on_close)
     but_exit.config(bg="red", fg="white")
     but_exit.place(x=(WINDOW_WIDTH/2)-(width/2), y=(WINDOW_HEIGHT/1.5), width=width, height=height)
 
@@ -79,14 +125,21 @@ def create_table():
     tbl_canvas.create_image(0, 0, image=tk_image, anchor=tk.NW)
     tbl_canvas.table_img = tk_image
     
-    for num, data in players.items():
-        create_player(num, data)
+    for num in players:
+        create_player(num)
     
     create_dealer()
+
+    global but_start
+    but_start = tk.Button(tbl_canvas, text="Alusta", command=lambda: start_game())
+    but_start.config(bg="white", fg="black", font=("Arial", 14))
+    but_start.place(x=(WINDOW_WIDTH/2)-(100/2), y=WINDOW_HEIGHT-50, width=100, height=40)
+
     
-def create_player(num: int, data: dict):
-    global tbl_canvas
+def create_player(num: int):
+    global tbl_canvas, players
     
+    data = players[num]
     name = data["name"]
     isbot = data["isbot"]
     
@@ -94,12 +147,15 @@ def create_player(num: int, data: dict):
     img = img.resize(MAN_FACE_SIZE, 1)
     tk_image = ImageTk.PhotoImage(img)
     
-    player_image = tbl_canvas.create_image((DISTANCE_BETWEEN_PLAYERS*num)+(DISTANCE_BETWEEN_PLAYERS/2)-(MAN_FACE_SIZE[0]/2), WINDOW_HEIGHT-200, image=tk_image, anchor=tk.NW)
+    player_image = tbl_canvas.create_image((DISTANCE_BETWEEN_PLAYERS*num)+(DISTANCE_BETWEEN_PLAYERS/2)-(MAN_FACE_SIZE[0]/2), WINDOW_HEIGHT-240, image=tk_image, anchor=tk.NW)
     tbl_canvas.players_imgs.insert(num, tk_image)
     
+    players[num]["pos"] = ((DISTANCE_BETWEEN_PLAYERS*num)+(DISTANCE_BETWEEN_PLAYERS/2), WINDOW_HEIGHT-100)
+    pos = players[num]["pos"]
+
     tbl_canvas.create_text(
-        (DISTANCE_BETWEEN_PLAYERS*num)+(DISTANCE_BETWEEN_PLAYERS/2),
-        WINDOW_HEIGHT-50, 
+        pos[0],
+        pos[1], 
         text=name, font=("Arial", 16), fill="white")
     
 def create_dealer():
@@ -116,13 +172,99 @@ def create_dealer():
         (WINDOW_WIDTH/2),
         140,
         text="Diiler", font=("Arial", 16), fill="white")
+    
+def create_buttons():
+    global players, cur_player, tbl_canvas, arrow, but_get_card, but_stay
+
+    if arrow:
+        tbl_canvas.delete(arrow)
+        but_get_card.destroy()
+        but_stay.destroy()
+
+    pos = players[cur_player]["pos"]
+
+    but_get_card = tk.Button(tbl_canvas, text="Võta kaart", command=lambda: get_card())
+    but_get_card.config(bg="white", fg="black", font=("Arial", 14))
+    but_get_card.place(x=(WINDOW_WIDTH/2)-(120/2)-80, y=WINDOW_HEIGHT-40, width=120, height=30)
+
+    but_stay = tk.Button(tbl_canvas, text="Ära võta", command=lambda: stay())
+    but_stay.config(bg="white", fg="black", font=("Arial", 14))
+    but_stay.place(x=(WINDOW_WIDTH/2)-(120/2)+80, y=WINDOW_HEIGHT-40, width=120, height=30)
+
+    arrow = tbl_canvas.create_text(
+        pos[0],
+        pos[1]+30,
+        text="↑", font=("Arial", 26), fill="white")
+    
+def create_card(num: int):
+    global tbl_canvas, players, cur_player
+    
+    img = Image.open(f"mang21/images/cards/{num}.png")
+    img = img.resize((40, 60), 1)
+    tk_image = ImageTk.PhotoImage(img)
+
+    player_pos = players[cur_player]["pos"]
+    pos = (player_pos[0], player_pos[1]-50)
+
+    #card_panel = tbl_canvas.create_rectangle(50, 70, 0, 0, fill="white", outline="black")
+    #card_image = tbl_canvas.create_image(pos[0]-5, pos[1]-5, image=tk_image, anchor=tk.NW)
+
+    card = {
+        "card": num,
+        "pos": ((WINDOW_WIDTH/2)-(100/2), 0),
+        "panel": card_panel,
+        "img": tk_image,
+        "image": card_image,
+    }
+
+    players[cur_player]["cards"].append(card)
+
+# --------------------------------------
+# game
+
+def start_game():
+    global game_started, cur_player, but_start
+    
+    if not game_started:
+        game_started = True
+
+    but_start.destroy()
+    cur_player = 0
+
+    create_buttons()
+
+def get_card():
+    global cur_player, players
+    
+    player = players[cur_player]
+    if player["isbot"]:
+        player["cards"] = [random.choice(list(CARDS.keys()))]
+        create_card(player["cards"][0])
+        pass
+    else:
+        player["cards"] = [random.choice(list(CARDS.keys()))]
+        create_card(player["cards"][0])
+        pass
+
+def stay():
+    next_player()
+
+def next_player():
+    global cur_player
+    
+    if cur_player < PLAYER_NUM-1:
+        cur_player += 1
+    else:
+        cur_player = 0
+
+    create_buttons()
 
 # --------------------------------------
 def register_player(num: int, name: str, isBot: bool):
     global players
     
     if len(players) < PLAYER_NUM:
-        players[num] = {"isbot": isBot, "name": name}
+        players[num] = {"isbot": isBot, "name": name, "score": 0, "cards": []}
         return True
     else:
         return False
