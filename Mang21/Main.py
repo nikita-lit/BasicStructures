@@ -127,7 +127,7 @@ def create_table():
     tbl_canvas.table_img = tk_image
     
     for num in players:
-        create_player(num)
+        create_player(num, "mang21/images/man_face.png")
     
     create_dealer()
     update_score()
@@ -138,27 +138,40 @@ def create_table():
     but_start.place(x=(WINDOW_WIDTH/2)-(100/2), y=WINDOW_HEIGHT-50, width=100, height=40)
 
     
-def create_player(num: int):
+def create_player(num: int, face: str):
     global tbl_canvas, players
+    
+    for key, d in players[num]["player_p"].items():
+        print(d)
     
     data = players[num]
     name = data["name"]
     isbot = data["isbot"]
     
-    img = Image.open("mang21/images/man_face.png")
+    img = Image.open(face)
     img = img.resize(MAN_FACE_SIZE, 1)
     tk_image = ImageTk.PhotoImage(img)
     
     player_image = tbl_canvas.create_image((DISTANCE_BETWEEN_PLAYERS*num)+(DISTANCE_BETWEEN_PLAYERS/2)-(MAN_FACE_SIZE[0]/2), WINDOW_HEIGHT-240, image=tk_image, anchor=tk.NW)
-    tbl_canvas.players_imgs.insert(num, tk_image)
     
     players[num]["pos"] = ((DISTANCE_BETWEEN_PLAYERS*num)+(DISTANCE_BETWEEN_PLAYERS/2), WINDOW_HEIGHT-100)
     pos = players[num]["pos"]
-
-    tbl_canvas.create_text(
+   
+    player_name = tbl_canvas.create_text(
         pos[0],
         pos[1], 
         text=name, font=("Arial", 16), fill="white")
+    
+    img_num = player_image
+    name_num = player_name
+    
+    panel_d = {
+        "img": tk_image,
+        "player_image": img_num,
+        "player_name": name_num,
+    }
+    
+    players[num]["player_p"] = panel_d
     
 def create_dealer():
     global tbl_canvas
@@ -273,8 +286,8 @@ def update_score():
         score = count_points(data["cards"])
         players[key]["score"] = score
         
-        if data["isbot"]:
-            score = "?"
+        #if data["isbot"]:
+        #    score = "?"
         
         pos = data["pos"]
         text = tbl_canvas.create_text(
@@ -299,24 +312,26 @@ def start_game():
     
 def ask_player():
     if players[cur_player]["isbot"]:
-        window.after(2000, bot_turn)
+        window.after(1000, bot_turn)
     else:
         create_buttons()
-
 
 def bot_turn():
     bot_cards = players[cur_player]["cards"]
     bot_score = count_points(bot_cards)
 
-    if bot_score < 17:
-        get_card()
-    elif bot_score >= 17 and bot_score < 21:
-        if random.randint(0, 100) < 30:
+    if random.randint(0, 100) < 10:
+        stay()
+    else:
+        if bot_score < 17:
             get_card()
+        elif bot_score >= 17 and bot_score < 21:
+            if random.randint(0, 100) < 30:
+                get_card()
+            else:
+                stay()
         else:
             stay()
-    else:
-        stay()
 
 def get_card():
     global cur_player, players
@@ -337,6 +352,15 @@ def get_card():
     next_player()
 
 def stay():
+    for key, data in players.items():
+        score = data["score"]
+        if score > 21:
+            create_player(key, "mang21/images/man_face_not_smile.png")
+        elif score == 21:
+            create_player(key, "mang21/images/man_face_smile.png")
+        else:
+            create_player(key, "mang21/images/man_face.png")
+    
     delete_buttons()
     next_player()
 
@@ -356,7 +380,7 @@ def register_player(num: int, name: str, isBot: bool):
     global players
     
     if len(players) < PLAYER_NUM:
-        players[num] = {"isbot": isBot, "name": name, "score": 0, "cards": [], "cards_p": []}
+        players[num] = {"isbot": isBot, "name": name, "score": 0, "cards": [], "cards_p": [], "player_p": {}}
         return True
     else:
         return False
