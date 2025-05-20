@@ -1,5 +1,4 @@
-PLAYER_NUM = 5
-BOT_COUNT = (PLAYER_NUM-1)
+PLAYER_NUM = 3
 
 MAN_FACE_SIZE = (128, 128)
 
@@ -22,3 +21,7 @@ CARDS = {
     "K": 10,
     "A": 11,
 }
+
+HUMAN = "human"
+BOT = "bot"
+DEALER = "dealer"

@@ -1,0 +1,133 @@
+[
+    {
+        "player_results": {
+            "Bot 1": {
+                "cards": [
+                    "3",
+                    "8",
+                    "5",
+                    "Q"
+                ],
+                "score": 26,
+                "result": "Kaotus"
+            },
+            "Bot 2": {
+                "cards": [
+                    "K",
+                    "8"
+                ],
+                "score": 18,
+                "result": "Viik"
+            },
+            "Sina": {
+                "cards": [
+                    "7",
+                    "J",
+                    "3"
+                ],
+                "score": 20,
+                "result": "Võitis"
+            }
+        },
+        "winnigs": 1000,
+        "dealer_score": 18
+    },
+    {
+        "player_results": {
+            "Bot 1": {
+                "cards": [
+                    "9",
+                    "9"
+                ],
+                "score": 18,
+                "result": "Kaotas"
+            },
+            "Bot 2": {
+                "cards": [
+                    "8",
+                    "10"
+                ],
+                "score": 18,
+                "result": "Kaotas"
+            },
+            "Sina": {
+                "cards": [
+                    "A",
+                    "8",
+                    "J",
+                    "Q"
+                ],
+                "score": 29,
+                "result": "Kaotus"
+            }
+        },
+        "winnigs": 0,
+        "dealer_score": 21
+    },
+    {
+        "player_results": {
+            "Bot 1": {
+                "cards": [
+                    "4",
+                    "7",
+                    "7"
+                ],
+                "score": 18,
+                "result": "Viik"
+            },
+            "Bot 2": {
+                "cards": [
+                    "10",
+                    "A"
+                ],
+                "score": 21,
+                "result": "Võitis"
+            },
+            "Sina": {
+                "cards": [
+                    "4",
+                    "9",
+                    "J"
+                ],
+                "score": 23,
+                "result": "Kaotus"
+            }
+        },
+        "winnigs": 0,
+        "dealer_score": 18
+    },
+    {
+        "player_results": {
+            "Bot 1": {
+                "cards": [
+                    "8",
+                    "3",
+                    "3"
+                ],
+                "score": 14,
+                "result": "Kaotas"
+            },
+            "Bot 2": {
+                "cards": [
+                    "2",
+                    "4",
+                    "5",
+                    "10"
+                ],
+                "score": 21,
+                "result": "Viik"
+            },
+            "Sina": {
+                "cards": [
+                    "K",
+                    "7",
+                    "7"
+                ],
+                "score": 24,
+                "result": "Kaotus"
+            }
+        },
+        "winnigs": 0,
+        "dealer_score": 21
+    }
+]
