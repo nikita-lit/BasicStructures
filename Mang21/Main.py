@@ -91,7 +91,7 @@ def create_menu():
     but_exit.configure(fg_color="red")
     but_exit.place(x=(WINDOW_WIDTH/2)-(250/2), y=430)
 
-    tbl_canvas.create_text(
+    title = tbl_canvas.create_text(
         (WINDOW_WIDTH/2),
         150, 
         text="Blackjack", font=("Arial", 36), fill="white")
@@ -110,19 +110,21 @@ def create_money_count():
         tbl_canvas.delete(money_text2)
 
     money_text = tbl_canvas.create_text(
-        100,
+        120,
         25, 
-        text="Raha: "+str(money)+"$", font=("Arial", 22), fill="white")
+        text="Raha: "+"${:,.2f}".format(money), font=("Arial", 22), fill="white")
     
     if bet > 0:
         money_text2 = tbl_canvas.create_text(
-            100,
+            120,
             65, 
-            text="Panus: "+str(bet)+"$", font=("Arial", 22), fill="white")
+            text="Panus: "+"${:,.2f}".format(bet), font=("Arial", 22), fill="white")
 
 def create_table():
     for widget in main_frame.winfo_children():
         widget.destroy()
+        
+    register_players()
         
     global tbl_canvas, money_text
     tbl_canvas = ctk.CTkCanvas(main_frame, width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
@@ -209,11 +211,14 @@ def create_back_to_menu():
 
 # --------------------------------------
 def create_player(num: int, face: str):
-    global tbl_canvas
+    global tbl_canvas     
     
     data = players[num]
     name = data["name"]
     type = data["type"]
+    
+    if data["player_p"]["player_image"]:
+        tbl_canvas.delete(data["player_p"]["player_image"])
 
     img = Image.open(face)
     img = img.resize(MAN_FACE_SIZE, 1)
@@ -408,10 +413,10 @@ def show_history():
         ctk.CTkLabel(history_frame, text="Ajalugu on tühi.", font=("Arial", 25)).pack(pady=20)
     else:
         for idx, entry in enumerate(reversed(history[-4:])):
-            text = f"\n  Mäng #{len(history)-idx} - Diileri skoor: {entry["dealer_score"]} | Võit: {entry["winnigs"]}  \n"
+            text = f"\n  Mäng #{len(history)-idx} - Diileri skoor: {entry['dealer_score']} | Võit: {entry['winnigs']}  \n"
 
             for pname, result in entry["player_results"].items():
-                text += f"  {pname}: {result["score"]} ({result["result"]}) - {result["cards"]}\n"
+                text += f"  {pname}: {result['score']} ({result['result']}) - {result['cards']}\n"
 
             label = ctk.CTkLabel(history_frame, text=text, font=("Arial", 20), justify="left", anchor="w")
             label.configure(fg_color="green")
@@ -446,7 +451,7 @@ def count_score(cards: dict):
     aces = 0
     for card in cards:
         score += CARDS[card]
-        if card == 'A':
+        if card == "A":
             aces += 1
     while score > 21 and aces:
         score -= 10
@@ -513,8 +518,8 @@ def bot_turn():
     else:
         if bot_score < 17:
             get_card()
-        elif bot_score >= 17 and bot_score < 21:
-            if random.randint(0, 100) < 30:
+        elif bot_score >= 18 and bot_score < 21:
+            if random.randint(0, 100) < 20:
                 get_card()
             else:
                 stay()
@@ -556,7 +561,10 @@ def get_card():
 
 def check_cards(player_id: int):
     if is_bust(player_id):
-        create_player(cur_player, "mang21/images/man_face_not_smile.png")
+        if players[player_id]["player_p"]["player_image"]:
+            tbl_canvas.delete(players[player_id]["player_p"]["player_image"])
+        
+        window.after(200, create_player, cur_player, "mang21/images/man_face_not_smile.png")
 
 def stay():
     if cur_player == PLAYER_NUM - 1:
@@ -571,6 +579,10 @@ def end_game():
     delete_arrow()
     
     for id, player in players.items():
+        if player["player_p"]["player_image"]:
+            tbl_canvas.delete(player["player_p"]["player_image"])
+    
+    for id, player in players.items():
         create_card(get_visible_cards(id), id)
         if player["type"] == DEALER:
             continue
@@ -580,30 +592,33 @@ def end_game():
 
         if is_bust(id):
             print(f"{name} busts! Kaotus.")
-            create_player(id, "mang21/images/man_face_not_smile.png")
+            window.after(500, create_player, id, "mang21/images/man_face_not_smile.png")
             player["result"] = "Kaotus"
         elif dealer_score > 21 or score > dealer_score:
             print(f"{name} võitis!")
-            create_player(id, "mang21/images/man_face_smile.png")
+            window.after(300, create_player, id, "mang21/images/man_face_smile.png")
             player["result"] = "Võitis"
             
             if player["type"] == HUMAN:
                 money += bet * 2
         elif score == dealer_score:
             print(f"{name} viik.")
+            window.after(300, create_player, id, "mang21/images/man_face.png")
             player["result"] = "Viik"
 
             if player["type"] == HUMAN:
                 cancel_bet()
         else:
             print(f"{name} kaotas.")
-            create_player(id, "mang21/images/man_face_not_smile.png")
+            window.after(300, create_player, id, "mang21/images/man_face_not_smile.png")
             player["result"] = "Kaotas"
+            
+    window.after(300, create_player, PLAYER_NUM, "mang21/images/man_face.png")
 
     bet = 0
     save_data()
     log_game()
-
+    
     create_start_new_game()
     create_back_to_menu()
     create_money_count()
@@ -615,12 +630,8 @@ def reset_game():
     is_dealer_turn = False
     cur_player = -1
 
-    for id, player in players.items():
-        player["score"] = 0
-        player["cards"] = []
-        player["cards_p"] = []
-        player["result"] = ""
-
+    players.clear()
+        
 def make_bet(sum: int):
     global money, bet
     sum = min(money, sum)
@@ -649,18 +660,21 @@ def register_player(player_id, name, player_type):
         "score": 0,
         "cards": [],
         "cards_p": [],
-        "player_p": {},
+        "player_p": {
+            "player_image": None
+        },
         "pos": None,
         "result": "",
     }
 
-for i in range(PLAYER_NUM):
-    if i < (PLAYER_NUM-1):
-        register_player(i, f"Bot {i+1}", BOT)
-    else:
-        register_player(i, f"Sina", HUMAN)
-        
-register_player(PLAYER_NUM, f"Diiler", DEALER)
+def register_players():
+    for i in range(PLAYER_NUM):
+        if i < (PLAYER_NUM-1):
+            register_player(i, f"Bot {i+1}", BOT)
+        else:
+            register_player(i, f"Sina", HUMAN)
+            
+    register_player(PLAYER_NUM, f"Diiler", DEALER)
 
 # --------------------------------------
 def get_dealer():
