@@ -1,9 +1,15 @@
+# --------------------------------------
+
 import customtkinter as ctk
 from tkinter import messagebox, colorchooser, filedialog
 from CTkColorPicker import *
 from PIL import Image, ImageTk
 import pygame
 import os
+import random
+import json
+
+# --------------------------------------
 
 #pygame.mixer.init()
 #pygame.mixer.music.load("music.mp3")
@@ -19,32 +25,37 @@ def stop_music():
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
+# --------------------------------------
 FACE_PARTS = {
-    #müts
-    "Nägu": {
+    "Pea": {
         "Puudub": None,
-        "Face1": "fotorobot/images/base1.png",
-        "Face2": "fotorobot/images/base2.png",
+        "Tavaline": "fotorobot/images/base1.png",
+        "Karvane": "fotorobot/images/base2.png",
+        "Kohev": "fotorobot/images/base3.png",
     },
     "Kõrvad": {
         "Puudub": None,
-        "Ears1": "fotorobot/images/forehead1.png",
-        "Ears2": "fotorobot/images/forehead2.png",
+        "Väikesed": "fotorobot/images/forehead1.png",
+        "Karvased": "fotorobot/images/forehead2.png",
+        "Kohevad": "fotorobot/images/forehead3.png",
     },
     "Silmad": {
         "Puudub": None,
-        "Eyes1": "fotorobot/images/eyes1.png",
-        "Eyes2": "fotorobot/images/eyes2.png",
+        "Suured pupillid": "fotorobot/images/eyes1.png",
+        "Huvitatud": "fotorobot/images/eyes2.png",
+        "Kurjad": "fotorobot/images/eyes3.png",
     },
     "Nina": {
         "Puudub": None,
-        "Nose1": "fotorobot/images/nose1.png",
-        "Nose2": "fotorobot/images/nose2.png",
+        "Tavaline": "fotorobot/images/nose1.png",
+        "Suur": "fotorobot/images/nose2.png",
+        "Väike": "fotorobot/images/nose3.png",
     },
     "Suu": {
         "Puudub": None,
-        "Mouth1": "fotorobot/images/mouth1.png",
-        "Mouth2": "fotorobot/images/mouth2.png",
+        "Lai": "fotorobot/images/mouth1.png",
+        "Keelega": "fotorobot/images/mouth2.png",
+        "Suur": "fotorobot/images/mouth3.png",
     },
 }
 
@@ -60,12 +71,24 @@ WINDOW_HEIGHT = 550
 CANVAS_WIDTH = 400
 CANVAS_HEIGHT = 400
 
+JSON_PARTS_FILE = "fotorobot/naoosad.json"
+
+# --------------------------------------
+def on_close():
+    save_parts()
+    window.destroy()
+
 def create_window():
+    global window
     window = ctk.CTk()
     window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
     window.resizable(False, False)
     window.title("Näo koostaja nuppudega")
     window.iconbitmap("icon.ico")
+    window.protocol("WM_DELETE_WINDOW", on_close)
+
+    os.makedirs("fotorobot/images", exist_ok=True)
+    load_parts()
 
     create_canvas()
     create_buttons()
@@ -95,7 +118,91 @@ def update_part(part_name, option_name):
     toggle_part(part_name, file, CANVAS_WIDTH/2, CANVAS_HEIGHT/2)
       
 def random_parts():
-    pass
+    for face_part, parts in FACE_PARTS.items():
+        part = random.choice(list(parts))
+        while part == "Puudub":
+            part = random.choice(list(parts))
+
+        update_part(face_part, part)
+        dropdowns[face_part].set(part)
+
+def ask_face_part():
+    selected_part = ctk.CTkInputDialog(text="Sisestage näoosa nimi (nt. Silmad, Nina):", title="Uus näoosa").get_input()
+    if not selected_part:
+        return None
+    
+    if selected_part not in FACE_PARTS:
+        messagebox.showerror("Viga", f"Näoosa '{selected_part}' ei eksisteeri.")
+        return None
+    
+    return selected_part
+
+def add_face_part():
+    selected_part = ask_face_part()
+    if not selected_part:
+        return
+    
+    file = filedialog.askopenfile(title="Vali pildifail", filetypes=[("PNG Pildid", "*.png")])
+    if not file:
+        return
+    
+    name_part = ctk.CTkInputDialog(text="Sisestage osa nimi:", title="Uus osa").get_input()
+    if not name_part:
+        return
+
+    if name_part in FACE_PARTS[selected_part]:
+        messagebox.showwarning("Hoiatus", f"Osa nimega '{name_part}' on juba olemas!")
+        return
+
+    FACE_PARTS[selected_part][name_part] = file.name
+
+    dropdown = dropdowns[selected_part]
+    new_values = list(FACE_PARTS[selected_part].keys())
+    dropdown.configure(values=new_values)
+    dropdown.set(name_part)
+    update_part(selected_part, name_part)
+    save_parts()
+
+    messagebox.showinfo("Info", f"Osa '{name_part}' lisatud!")
+
+def remove_face_part():
+    selected_part = ask_face_part()
+    if not selected_part:
+        return
+
+    part = ctk.CTkInputDialog(text="Sisestage osa nimi:", title="Kustuta näoosa").get_input()
+    if not part:
+        return
+    
+    parts = FACE_PARTS[selected_part]
+    for name, file in parts.items():
+        if name == part:
+            parts.pop(name)
+
+            dropdown = dropdowns[selected_part]
+            new_values = list(FACE_PARTS[selected_part].keys())
+            dropdown.configure(values=new_values)
+            dropdown.set("Puudub")
+
+            update_part(selected_part, "Puudub")
+            messagebox.showinfo("Info", f"Osa '{name}' kustutatud!")
+            return
+            
+    messagebox.showwarning("Hoiatus", f"Osa '{part}' ei leitud!")
+
+def save_parts():
+    global FACE_PARTS
+
+    with open(JSON_PARTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(FACE_PARTS, f, indent=4, ensure_ascii=False)
+
+def load_parts():
+    global FACE_PARTS
+    try:
+        with open(JSON_PARTS_FILE, "r", encoding="utf-8") as f:
+            FACE_PARTS = json.load(f)
+    except:
+        pass
       
 # -------------------------------------- 
 def save_face():
@@ -104,26 +211,37 @@ def save_face():
     if not filename:
         return
     
-    image_result = Image.new("RGBA", (CANVAS_WIDTH, CANVAS_HEIGHT), (255, 255, 255, 255))
-    
+    if bg_filepath and os.path.exists(bg_filepath):
+        image_result = Image.open(bg_filepath).convert("RGBA").resize((CANVAS_WIDTH, CANVAS_HEIGHT), 1)
+    else:
+        image_result = Image.new("RGBA", (CANVAS_WIDTH, CANVAS_HEIGHT), bg_color_code)
+
     for face_part in FACE_PARTS:
         if parts.get(face_part):
             part = Image.open(parts[face_part]).convert("RGBA").resize((CANVAS_WIDTH, CANVAS_HEIGHT), 1)
             image_result.alpha_composite(part)
-            
-    image_result.save(f"fotorobot/pildid/{filename}.png")
-    messagebox.showinfo("Info", f"Pilt {filename}.png salvestatud!")
+    
+    try:
+        image_result.save(f"fotorobot/{filename}.png")
+        messagebox.showinfo("Info", f"Pilt '{filename}.png' salvestatud!")
+    except Exception as e:
+        messagebox.showerror("Viga", f"{e}")
     
 def clear_canvas():
     for face_part in FACE_PARTS:
         update_part(face_part, "Puudub")
+
+    for face_part, dropdown in dropdowns.items():
+        dropdown.set("Puudub")
        
 # --------------------------------------   
 bg_rect = None
+bg_filepath = None
+bg_color_code = "#ffffff"
 bg_image = None
             
 def choose_color():
-    global bg_label, bg_rect
+    global bg_label, bg_rect, bg_color_code, bg_filepath
     pick_color = AskColor(title="Valige värv")
     color_code = pick_color.get()
 
@@ -134,10 +252,14 @@ def choose_color():
         bg_label.configure(text=f"Valitud värv: {color_code}")
         bg_rect = canvas.create_rectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, fill=color_code)
         canvas.tag_lower(bg_rect)
+
+        bg_filepath = None
+        bg_color_code = color_code
         
 def choose_background_img():
-    global bg_label, bg_rect, bg_image
+    global bg_label, bg_rect, bg_image, bg_color_code, bg_filepath
     filepath = filedialog.askopenfile(title="Valige fail", filetypes=[("PNG pildid", "*.png")])
+
     if filepath and os.path.exists(filepath.name):
         if bg_rect:
             canvas.delete(bg_rect)
@@ -150,6 +272,9 @@ def choose_background_img():
         canvas.tag_lower(bg_rect)
         
         bg_label.configure(text=f"Valitud fail: {os.path.basename(filepath.name)}")
+
+        bg_filepath = filepath.name
+        bg_color_code = None
 
 def clear_bg():
     global bg_image, bg_label, bg_rect
@@ -167,7 +292,7 @@ button_config = {
     "corner_radius": 10,
 }
 
-dropdowns = []
+dropdowns = {}
 
 def create_faceparts(pframe):
     global dropdowns
@@ -191,13 +316,24 @@ def create_faceparts(pframe):
             variable=var
         )
         dropdown.pack(padx=5, pady=5)
-        dropdowns.append(dropdown)
+        dropdowns[part_name] = dropdown
         
     bframe = ctk.CTkFrame(frame)
-    bframe.pack(side="right", padx=5)
+    bframe.pack(side="right", padx=5, pady=5, fill=ctk.BOTH, expand=True)
     
+    add_button = ctk.CTkButton(bframe, text="Lisa osa", command=add_face_part, **button_config)
+    add_button.pack(side="top", pady=5, padx=5)
+
+    remove_button = ctk.CTkButton(bframe, text="Kustuta osa", command=remove_face_part, **button_config)
+    remove_button.pack(side="top", pady=5, padx=5)
+
     clear_button = ctk.CTkButton(bframe, text="Puhasta", command=clear_canvas, **button_config)
-    clear_button.pack(side="top", pady=5, padx=5)
+    clear_button.configure(height=30)
+    clear_button.pack(side="top", pady=(25, 5), padx=5)
+
+    rand_button = ctk.CTkButton(bframe, text="Juhuslik", command=random_parts, **button_config)
+    rand_button.configure(height=30)
+    rand_button.pack(side="top", pady=5, padx=5)
             
 def create_canvas():
     frame = ctk.CTkFrame(window)
