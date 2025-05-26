@@ -184,13 +184,15 @@ def insert_into_table(cursor, data: dict):
 create_db()
 
 search_entry = None
+root = None
     
 def create_window_table():
+    global root
     root = ctk.CTk()
     root.title("Filmid")
 
     frame = ctk.CTkFrame(root)
-    frame.pack(pady=20, fill=ctk.BOTH, expand=True)
+    frame.pack(pady=20, fill=ctk.BOTH, expand=True, padx=25)
     scrollbar = ctk.CTkScrollbar(frame)
     scrollbar.pack(side=ctk.RIGHT, fill=ctk.Y)
     
@@ -237,10 +239,43 @@ def create_window_table():
     search_button.pack(side=ctk.LEFT)
     
     open_button = ctk.CTkButton(search_frame, text="Lisa andmeid", command=add_data, width=25)
-    open_button.pack(pady=20, padx=20)
-
+    open_button.pack(pady=20, padx=10, side=ctk.LEFT)
+    
+    update_button = ctk.CTkButton(search_frame, text="Uuenda", command=lambda tree=tree: on_update(tree))
+    update_button.pack(pady=20, padx=5, side=ctk.LEFT)
+    
+    delete_button = ctk.CTkButton(search_frame, text="Kustuta", command=lambda tree=tree: on_delete(tree))
+    delete_button.pack(pady=20, padx=(5, 10),)
+    
     root.mainloop()
     
+def open_update_window(tree, record_id):
+    update_window = ctk.CTkToplevel(root)
+    update_window.title("Muuda filmi andmeid")
+
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT title, director, release_year, genre, duration, rating, language, country, description FROM movies WHERE id=?", (record_id,))
+    record = cursor.fetchone()
+    conn.close()
+
+    if not record:
+        messagebox.showerror("Viga", f"Record IDga {record_id} ei leitud.")
+        return
+
+    labels = ["Pealkiri", "Režissöör", "Aasta", "Žanr", "Kestus", "Reiting", "Keel", "Riik", "Kirjeldus"]
+    entries = {}
+
+    for i, label in enumerate(labels):
+        ctk.CTkLabel(update_window, text=label).grid(row=i, column=0, padx=10, pady=5, sticky=ctk.W)
+        entry = ctk.CTkEntry(update_window, width=350)
+        entry.grid(row=i, column=1, padx=10, pady=5)
+        entry.insert(0, record[i])
+        entries[label] = entry
+
+    save_button = ctk.CTkButton(update_window, text="Salvesta", command=lambda: update_record(tree, record_id, entries, update_window))
+    save_button.grid(row=len(labels), column=0, columnspan=2, pady=10)
+
 def add_data():
     subprocess.run(["python", "SQL_db/insert_data_win.py"])
     
@@ -265,5 +300,65 @@ def load_data_from_db(tree, search_query=""):
             if conn:
                 conn.commit()
                 conn.close()
+  
+def on_update(tree):
+    selected_item = tree.selection()
+    if selected_item:
+        record_id = tree.item(selected_item[0], 'values')[0]
+        try:
+            record_id = int(record_id)
+            open_update_window(tree, record_id)
+        except ValueError:
+            messagebox.showerror("Error", "Valitud sobimatu ID!")
+    else:
+        messagebox.showwarning("Valik puudub", "Palun vali kõigepealt rida!")
+  
+def on_delete(tree):
+    selected_item = tree.selection()
+    if selected_item:
+        record_id = tree.item(selected_item[0], 'values')[0]
+        confirm = messagebox.askyesno("Kinnita kustutamine", "Kas oled kindel, et soovid selle rea kustutada?")
+        if confirm:
+            try:
+                conn = sqlite3.connect(DATABASE_PATH)
+                cursor = conn.cursor()
+
+                cursor.execute("DELETE FROM movies WHERE id=?", (record_id,))
+                conn.commit()
+                conn.close()
+
+                load_data_from_db(tree)
+               
+                messagebox.showinfo("Edukalt kustutatud", "Rida on edukalt kustutatud!")
+            except sqlite3.Error as e:
+                messagebox.showerror("Viga", f"Andmebaasi viga: {e}")
+    else:
+        messagebox.showwarning("Valik puudub", "Palun vali kõigepealt rida!")
+  
+def update_record(tree, record_id, entries, window):
+    title = entries["Pealkiri"].get()
+    director = entries["Režissöör"].get()
+    release_year = entries["Aasta"].get()
+    genre = entries["Žanr"].get()
+    duration = entries["Kestus"].get()
+    rating = entries["Reiting"].get()
+    language = entries["Keel"].get()
+    country = entries["Riik"].get()
+    description = entries["Kirjeldus"].get()
+
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE movies
+        SET title=?, director=?, release_year=?, genre=?, duration=?, rating=?, language=?, country=?, description=?
+        WHERE id=?
+    """, (title, director, release_year, genre, duration, rating, language, country, description, record_id))
+    conn.commit()
+    conn.close()
+
+    load_data_from_db(tree)
+    window.destroy()
+
+    messagebox.showinfo("Salvestamine", "Andmed on edukalt uuendatud!")
   
 create_window_table()
