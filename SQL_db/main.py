@@ -1,10 +1,6 @@
 import sqlite3
-import customtkinter as ctk
+import tkinter as tk
 from tkinter import messagebox, ttk
-import subprocess
-
-ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("green")
 
 movies_data = [
     {
@@ -183,23 +179,25 @@ def insert_into_table(cursor, data: dict):
     
 create_db()
 
+# --------------------------------------
 search_entry = None
 root = None
-    
+
 def create_window_table():
     global root
-    root = ctk.CTk()
+    root = tk.Tk()
     root.title("Filmid")
+    root.geometry("1200x500")
 
-    frame = ctk.CTkFrame(root)
-    frame.pack(pady=20, fill=ctk.BOTH, expand=True, padx=25)
-    scrollbar = ctk.CTkScrollbar(frame)
-    scrollbar.pack(side=ctk.RIGHT, fill=ctk.Y)
+    frame = tk.Frame(root)
+    frame.pack(pady=20, fill=tk.BOTH, expand=True, padx=20)
+    scrollbar = tk.Scrollbar(frame)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     
     tree = ttk.Treeview(frame, yscrollcommand=scrollbar.set, columns=("id", "title", "director", "year", "genre", "duration", "rating", "language", "country", "description"), show="headings")
-    tree.pack(fill=ctk.BOTH, expand=True)
+    tree.pack(fill=tk.BOTH, expand=True)
 
-    scrollbar.configure(command=tree.yview)
+    scrollbar.config(command=tree.yview)
 
     tree.heading("id", text="ID")
     tree.heading("title", text="Pealkiri")
@@ -225,32 +223,33 @@ def create_window_table():
     
     load_data_from_db(tree)
     
-    search_frame = ctk.CTkFrame(root)
-    search_frame.pack(pady=10)
+    search_frame = tk.Frame(root)
+    search_frame.pack(pady=5, expand=True, fill=tk.BOTH)
 
-    search_label = ctk.CTkLabel(search_frame, text="Otsi filmi pealkirja järgi:")
-    search_label.pack(side=ctk.LEFT, padx=10)
+    search_label = tk.Label(search_frame, text="Otsi filmi pealkirja järgi:")
+    search_label.pack(side=tk.LEFT, padx=10)
 
     global search_entry
-    search_entry = ctk.CTkEntry(search_frame)
-    search_entry.pack(side=ctk.LEFT, padx=10)
+    search_entry = tk.Entry(search_frame)
+    search_entry.pack(side=tk.LEFT, padx=10)
 
-    search_button = ctk.CTkButton(search_frame, text="Otsi", command=lambda tree=tree: on_search(tree), width=100)
-    search_button.pack(side=ctk.LEFT)
+    search_button = tk.Button(search_frame, text="Otsi", command=lambda tree=tree: on_search(tree), width=20)
+    search_button.pack(side=tk.LEFT)
     
-    open_button = ctk.CTkButton(search_frame, text="Lisa andmeid", command=add_data, width=25)
-    open_button.pack(pady=20, padx=10, side=ctk.LEFT)
+    update_button = tk.Button(search_frame, text="Uuenda", command=lambda tree=tree: on_update(tree))
+    update_button.pack(pady=5, padx=(5, 20), side=tk.RIGHT)
     
-    update_button = ctk.CTkButton(search_frame, text="Uuenda", command=lambda tree=tree: on_update(tree))
-    update_button.pack(pady=20, padx=5, side=ctk.LEFT)
+    delete_button = tk.Button(search_frame, text="Kustuta", command=lambda tree=tree: on_delete(tree))
+    delete_button.pack(pady=5, padx=5, side=tk.RIGHT)
     
-    delete_button = ctk.CTkButton(search_frame, text="Kustuta", command=lambda tree=tree: on_delete(tree))
-    delete_button.pack(pady=20, padx=(5, 10),)
+    open_button = tk.Button(search_frame, text="Lisa andmeid", command=lambda tree=tree: add_data(tree), width=25)
+    open_button.pack(pady=5, padx=5, side=tk.RIGHT)
     
     root.mainloop()
     
+# --------------------------------------
 def open_update_window(tree, record_id):
-    update_window = ctk.CTkToplevel(root)
+    update_window = tk.Toplevel(root)
     update_window.title("Muuda filmi andmeid")
 
     conn = sqlite3.connect(DATABASE_PATH)
@@ -267,18 +266,87 @@ def open_update_window(tree, record_id):
     entries = {}
 
     for i, label in enumerate(labels):
-        ctk.CTkLabel(update_window, text=label).grid(row=i, column=0, padx=10, pady=5, sticky=ctk.W)
-        entry = ctk.CTkEntry(update_window, width=350)
+        tk.Label(update_window, text=label).grid(row=i, column=0, padx=10, pady=5, sticky=tk.W)
+        entry = tk.Entry(update_window, width=80)
         entry.grid(row=i, column=1, padx=10, pady=5)
         entry.insert(0, record[i])
         entries[label] = entry
 
-    save_button = ctk.CTkButton(update_window, text="Salvesta", command=lambda: update_record(tree, record_id, entries, update_window))
+    save_button = tk.Button(update_window, text="Salvesta", command=lambda: update_record(tree, record_id, entries, update_window))
     save_button.grid(row=len(labels), column=0, columnspan=2, pady=10)
 
-def add_data():
-    subprocess.run(["python", "SQL_db/insert_data_win.py"])
+# --------------------------------------
+entries = {}
+window = None
+def add_data(tree):
+    global window
+    window = tk.Toplevel(root)
+    window.title("Filmi andmete sisestamine")
+
+    labels = ["Pealkiri", "Režissöör", "Aasta", "Žanr", "Kestus", "Reiting", "Keel", "Riik", "Kirjeldus"]
+
+    for i, label in enumerate(labels):
+        tk.Label(window, text=label).grid(row=i, column=0, padx=10, pady=5)
+        entry = tk.Entry(window, width=80)
+        entry.grid(row=i, column=1, padx=10, pady=5)
+        entries[label] = entry
+
+    submit_button = tk.Button(window, text="Sisesta andmed", command=lambda tree=tree: insert_data(tree))
+    submit_button.grid(row=len(labels), column=0, columnspan=2, pady=20)
     
+def clear_entries():
+    global entries
+    for entry in entries.values():
+        entry.delete(0, tk.END)
+    
+def validate_data():
+    title = entries["Pealkiri"].get()
+    release_year = entries["Aasta"].get()
+    rating = entries["Reiting"].get()
+
+    if not title:
+        messagebox.showerror("Viga", "Pealkiri on kohustuslik!")
+        return False
+    if not release_year.isdigit():
+        messagebox.showerror("Viga", "Aasta peab olema arv!")
+        return False
+    if rating and (not rating.replace('.', '', 1).isdigit() or not (0 <= float(rating) <= 10)):
+        messagebox.showerror("Viga", "Reiting peab olema vahemikus 0 kuni 10!")
+        return False
+
+    return True
+    
+def insert_data(tree):
+    if validate_data():
+        try:
+            conn = sqlite3.connect(DATABASE_PATH)
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                INSERT INTO movies (title, director, release_year, genre, duration, rating, language, country, description)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                entries["Pealkiri"].get(),
+                entries["Režissöör"].get(),
+                entries["Aasta"].get(),
+                entries["Žanr"].get(),
+                entries["Kestus"].get(),
+                entries["Reiting"].get(),
+                entries["Keel"].get(),
+                entries["Riik"].get(),
+                entries["Kirjeldus"].get()
+            ))
+        except sqlite3.Error as error:
+            print("Tekkis viga andmebaasiga ühendamisel:", error)
+        finally:    
+            load_data_from_db(tree)
+            if conn:
+                conn.commit()
+                conn.close()
+                
+        messagebox.showinfo("Edu", "Andmed sisestati edukalt!")
+    
+# --------------------------------------
 def on_search(tree):
     search_query = search_entry.get()
     load_data_from_db(tree, search_query)
@@ -300,7 +368,8 @@ def load_data_from_db(tree, search_query=""):
             if conn:
                 conn.commit()
                 conn.close()
-  
+
+# --------------------------------------
 def on_update(tree):
     selected_item = tree.selection()
     if selected_item:
@@ -315,6 +384,7 @@ def on_update(tree):
   
 def on_delete(tree):
     selected_item = tree.selection()
+    
     if selected_item:
         record_id = tree.item(selected_item[0], 'values')[0]
         confirm = messagebox.askyesno("Kinnita kustutamine", "Kas oled kindel, et soovid selle rea kustutada?")
