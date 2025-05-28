@@ -19,6 +19,8 @@ COUNTRIES = "countries"
 GENRES = "genres"
 DIRECTORS = "directors"
 
+tables = {}
+
 movies_data = [
     {
         "title": "The From In With.",
@@ -169,21 +171,27 @@ def create_db():
             
     return not isError
 
-def create_table(cursor, name: str, fields: dict, foreign_keys: dict = {}):
-    field_defs = []
+def create_table(cursor, tbl_name: str, columns: dict, foreign_keys: dict = {}):
+    column_defs = []
 
-    for field_name, field_type in fields.items():
-        field_defs.append(f"{field_name} {field_type}")
+    for column_name, column_type in columns.items():
+        column_defs.append(f"{column_name} {column_type}")
 
-    for fk_field, ref in foreign_keys.items():
-        field_defs.append(f"FOREIGN KEY ({fk_field}) REFERENCES {ref}")
+    for fk_column, ref in foreign_keys.items():
+        column_defs.append(f"FOREIGN KEY ({fk_column}) REFERENCES {ref}")
 
-    field_defs_str = ",\n".join(field_defs)
+    column_defs_str = ",\n".join(column_defs)
     query = f"""
-    CREATE TABLE IF NOT EXISTS {name} (
-        {field_defs_str}
+    CREATE TABLE IF NOT EXISTS {tbl_name} (
+        {column_defs_str}
     );
     """
+    
+    global tables
+    tables[tbl_name] = {
+        "columns": columns,
+        "foreign_keys": foreign_keys,
+    }
     
     cursor.execute(query)
 
@@ -240,10 +248,11 @@ def read_table(cursor, tbl_name, options):
     cursor.execute(f"SELECT * FROM {tbl_name} {options}")
     return cursor.fetchall()
 
-def get_tbl_columns_names(cursor, tbl_name: str):
-    cursor.execute(f"PRAGMA table_info({tbl_name})")
-    columns = [col[1] for col in cursor.fetchall()]
-    return columns
+def get_tbl_columns(tbl_name: str):
+    return tables[tbl_name]["columns"]
+
+def get_tbl_foreign_keys(tbl_name: str):
+    return tables[tbl_name]["foreign_keys"]
     
 def load_data_from_db(tree, tbl_name, row_name="", search_query=""):
     try:
@@ -257,8 +266,10 @@ def load_data_from_db(tree, tbl_name, row_name="", search_query=""):
             search = f"WHERE {row_name} LIKE '%{search_query}%'"
             
         rows = read_table(cursor, tbl_name, search)    
-        columns = get_tbl_columns_names(cursor, tbl_name)
-        
+        columns = list(get_tbl_columns(tbl_name))
+        foreign_keys = get_tbl_foreign_keys(tbl_name)
+        print(foreign_keys)
+
         for row in rows:
             values = []
             for col in tree.columns:
