@@ -40,7 +40,7 @@ movies_data = [
         "genre_id": 1,
         "duration": 148,
         "rating": 8.8,
-        "language_id": 1,
+        "language_id": 2,
         "country_id": 1,
         "description": "The A The On The In. By To A At On The. From The In With At In To A."
     },
@@ -51,7 +51,7 @@ movies_data = [
         "genre_id": 1,
         "duration": 175,
         "rating": 9.2,
-        "language_id": 1,
+        "language_id": 2,
         "country_id": 1,
         "description": "On From The By At The A. In From By With To On. A The By In With At On To A."
     },
@@ -73,7 +73,7 @@ movies_data = [
         "genre_id": 1,
         "duration": 152,
         "rating": 9.0,
-        "language_id": 1,
+        "language_id": 3,
         "country_id": 1,
         "description": "The A By On In The. At With To A From On The. With On By The A In To From."
     },
@@ -95,7 +95,7 @@ movies_data = [
         "genre_id": 1,
         "duration": 112,
         "rating": 7.8,
-        "language_id": 1,
+        "language_id": 2,
         "country_id": 1,
         "description": "A The On By In The At. From With A On By To The. In The By With At A From."
     },
@@ -106,7 +106,7 @@ movies_data = [
         "genre_id": 1,
         "duration": 126,
         "rating": 7.9,
-        "language_id": 1,
+        "language_id": 3,
         "country_id": 1,
         "description": "By With A On In The From. The By At A With On To. At In The By From With A."
     },
@@ -128,7 +128,7 @@ movies_data = [
         "genre_id": 1,
         "duration": 163,
         "rating": 9.1,
-        "language_id": 1,
+        "language_id": 3,
         "country_id": 1,
         "description": "On The A By In The From. With By On A The In From. To The In At By With On A."
     }
@@ -215,24 +215,29 @@ def init_tables(cursor):
         "country_id": "countries(id)",
     })
     
+    create_table(cursor, DIRECTORS, {
+        "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+        "name": "TEXT UNIQUE NOT NULL",
+    })
+
     create_table(cursor, LANGUAGES, {
         "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
-        "description": "TEXT UNIQUE NOT NULL",
+        "name": "TEXT UNIQUE NOT NULL",
     })
     
     create_table(cursor, COUNTRIES, {
         "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
-        "description": "TEXT UNIQUE NOT NULL",
+        "name": "TEXT UNIQUE NOT NULL",
     })
     
     create_table(cursor, GENRES, {
         "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
-        "description": "TEXT UNIQUE NOT NULL",
+        "name": "TEXT UNIQUE NOT NULL",
     })
     
     create_table(cursor, COUNTRIES, {
         "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
-        "description": "TEXT UNIQUE NOT NULL",
+        "name": "TEXT UNIQUE NOT NULL",
     })
     
 def insert_into_table(cursor, table_name: str, data: dict):
@@ -244,6 +249,37 @@ def insert_into_table(cursor, table_name: str, data: dict):
     cursor.execute(query, values)
  
 # --------------------------------------
+def build_select_query(tbl_name: str) -> str:
+    columns = get_tbl_columns(tbl_name)
+    foreign_keys = get_tbl_foreign_keys(tbl_name)
+
+    main_alias = tbl_name  # alias для главной таблицы
+    select_fields = []
+    join_clauses = []
+
+    for col in columns:
+        if col in foreign_keys:
+            ref_table = foreign_keys[col].split('(')[0].strip()
+            display_col = "name"
+            alias = ref_table
+
+            select_fields.append(f"{alias}.{display_col} AS {col}_name")
+
+            join_clauses.append(
+                f"LEFT JOIN {ref_table} {alias} ON {main_alias}.{col} = {alias}.id"
+            )
+        else:
+            select_fields.append(f"{main_alias}.{col}")
+
+    query = f"""
+        SELECT {', '.join(select_fields)}
+        FROM {tbl_name} {main_alias}
+        {' '.join(join_clauses)}
+    """
+
+    return query.strip()
+
+
 def read_table(cursor, tbl_name, options):
     cursor.execute(f"SELECT * FROM {tbl_name} {options}")
     return cursor.fetchall()
@@ -260,15 +296,17 @@ def load_data_from_db(tree, tbl_name, row_name="", search_query=""):
             tree.delete(item)
         
         conn, cursor = connect_db()
+        query = build_select_query(tbl_name)
         
-        search = ""
-        if len(row_name) > 0:
-            search = f"WHERE {row_name} LIKE '%{search_query}%'"
+        if row_name:
+            query += f" WHERE {row_name} LIKE ?"
+            cursor.execute(query, (f"%{search_query}%",))
+        else:
+            cursor.execute(query)
             
-        rows = read_table(cursor, tbl_name, search)    
+        rows = cursor.fetchall()   
         columns = list(get_tbl_columns(tbl_name))
-        foreign_keys = get_tbl_foreign_keys(tbl_name)
-        print(foreign_keys)
+        print(rows)
 
         for row in rows:
             values = []
