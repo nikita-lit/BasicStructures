@@ -5,6 +5,7 @@
 import sqlite3
 import customtkinter as ctk
 from tkinter import messagebox, ttk
+import os
 
 # --------------------------------------
 
@@ -135,7 +136,7 @@ movies_data = [
 ]
 
 # --------------------------------------
-def connect_db():
+def connect_db() -> tuple:
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     return (conn, cursor)
@@ -269,40 +270,34 @@ def insert_into_table(cursor, table_name: str, data: dict):
 # --------------------------------------
 def build_select_query(tbl_name: str, where: str = "", do_foreign_keys: bool = True):
     columns = get_tbl_columns(tbl_name)
-    foreign_keys = get_tbl_foreign_keys(tbl_name)
+    foreign_keys = get_tbl_foreign_keys(tbl_name) 
 
-    select_fields = []
-    join_clauses = []
+    if not do_foreign_keys:
+        foreign_keys = {}
+
+    select_columns = []
+    joins = []
 
     for col in columns:
-        if do_foreign_keys and col in foreign_keys:
-            ref_table = foreign_keys[col].split('(')[0].strip()
-            display_col = "name"
-            alias = ref_table
+        if col in foreign_keys:
+            ref_table = foreign_keys[col].split("(")[0].strip() # ["ref_table_name", "id)"]
 
-            select_fields.append(f"{alias}.{display_col} AS {col}_name")
-
-            join_clauses.append(
-                f"LEFT JOIN {ref_table} {alias} ON {tbl_name}.{col} = {alias}.id"
+            select_columns.append(f"{ref_table}.name AS {col}_name")
+            joins.append(
+                f"LEFT JOIN {ref_table} ON {tbl_name}.{col} = {ref_table}.id"
             )
         else:
-            select_fields.append(f"{tbl_name}.{col}")
+            select_columns.append(f"{tbl_name}.{col}")
 
-    query = f"""
-        SELECT {', '.join(select_fields)}
-        FROM {tbl_name} {tbl_name}
-        {' '.join(join_clauses)}
-    """
+    query = f"SELECT {', '.join(select_columns)} FROM {tbl_name} "
     
-    if where != "":
-        query += f"WHERE {where}"
+    if joins:
+        query += " ".join(joins)
+
+    if where:
+        query += f" WHERE {where}"
 
     return query.strip()
-
-
-def read_table(cursor, tbl_name, options):
-    cursor.execute(f"SELECT * FROM {tbl_name} {options}")
-    return cursor.fetchall()
 
 def get_tbl_columns(tbl_name: str):
     return tables[tbl_name]["columns"]
@@ -316,10 +311,18 @@ def load_data_from_db(tree, tbl_name, row_name="", search_query=""):
             tree.delete(item)
         
         conn, cursor = connect_db()
+
+        foreign_keys = get_tbl_foreign_keys(tbl_name)
+        real_row_name = row_name
+
+        if row_name in foreign_keys:
+            real_row_name += "_name" # SELECT directors.name AS director_id_name
+
+        # --------------------------------------
         query = build_select_query(tbl_name)
         
         if row_name != "":
-            query += f" WHERE {row_name} LIKE ?"
+            query += f" WHERE {real_row_name} LIKE ?"
             cursor.execute(query, (f"%{search_query}%",))
         else:
             cursor.execute(query)
@@ -333,8 +336,7 @@ def load_data_from_db(tree, tbl_name, row_name="", search_query=""):
                 if col in columns:
                     idx = columns.index(col)
                     values.append(row[idx])
-                else:
-                    values.append("")
+
             tree.insert("", "end", values=values)
     except sqlite3.Error as error:
         print("Tekkis viga andmebaasiga ühendamisel:", error)
@@ -344,7 +346,9 @@ def load_data_from_db(tree, tbl_name, row_name="", search_query=""):
             conn.close()
     
 # --------------------------------------
+# GUI
 window = None
+tbl_tree_frame = None
 
 def create_window():
     global window
@@ -355,26 +359,77 @@ def create_window():
     tables_frame = ctk.CTkFrame(window, height=80)
     tables_frame.pack(pady=(20, 0), padx=20, fill=ctk.X)
     
-    for tbl_name in tables:
-        search_button = ctk.CTkButton(tables_frame, text=tbl_name, width=50)
-        search_button.pack(side=ctk.LEFT, padx=(5, 0), pady=5)
-    
-    columns = {
-        "id": "ID",
-        "title": "Pealkiri",
-        "director_id": "Režissöör",
-        "release_year": "Aasta",
-        "genre_id": "Žanr",
-        "language_id": "Keel",
-        "duration": "Kestus",
-        "rating": "Hinnang",
+    tables_b = {
+        MOVIES: "Filmid",
+        LANGUAGES: "Keeled",
+        DIRECTORS: "Režissöörid",
+        COUNTRIES: "Riigid",
+        GENRES: "Žanrid"
     }
-    
-    frame = ctk.CTkFrame(window)
-    frame.pack(padx=20, pady=20, fill=ctk.BOTH, expand=True)
-    create_tree(frame, MOVIES, columns)
+
+    for tbl_name, name in tables_b.items():
+        search_button = ctk.CTkButton(tables_frame, text=name, command=lambda tbl_name=tbl_name: open_table(tbl_name), width=50)
+        search_button.pack(side=ctk.LEFT, padx=(5, 0), pady=5)
+
+    open_table(MOVIES)
     
     window.mainloop()
+
+def open_table(tbl_name):
+    global tbl_tree_frame
+    if tbl_tree_frame:
+        for widget in tbl_tree_frame.winfo_children():
+            widget.destroy()
+
+        tbl_tree_frame.destroy()
+
+    columns = {}
+    
+    if tbl_name == MOVIES:
+        columns = {
+            "id": "ID",
+            "title": "Pealkiri",
+            "director_id": "Režissöör",
+            "release_year": "Väljalaskeaasta",
+            "genre_id": "Žanr",
+            "duration": "Kestus (min)",
+            "rating": "Hinne",
+            "language_id": "Keel",
+            "country_id": "Riik",
+            "description": "Kirjeldus"
+        }
+    elif tbl_name == LANGUAGES:
+        columns = {
+            "id": "ID",
+            "name": "Keel"
+        }
+
+    elif tbl_name == DIRECTORS:
+
+        columns = {
+            "id": "ID",
+            "name": "Režissöör"
+        }
+
+    elif tbl_name == COUNTRIES:
+
+        columns = {
+            "id": "ID",
+            "name": "Riik"
+        }
+
+    elif tbl_name == GENRES:
+        columns = {
+            "id": "ID",
+            "name": "Žanr"
+        }
+    else:
+        messagebox.showerror("Viga", "Tundmatu tabel!")
+        return
+    
+    tbl_tree_frame = ctk.CTkFrame(window)
+    tbl_tree_frame.pack(padx=20, pady=20, fill=ctk.BOTH, expand=True)
+    create_tree(tbl_tree_frame, tbl_name, columns)
     
 # --------------------------------------
 def open_record_window(root, tree, record_id):
@@ -439,32 +494,41 @@ def on_delete(tree):
             conn, cursor = connect_db()
             for i in indexes:
                 cursor.execute(f"DELETE FROM {tree.table_name} WHERE id={i}")
-                
-            conn.commit()
-            conn.close()
-
-            load_data_from_db(tree, MOVIES)
         
-            messagebox.showinfo("Edukalt kustutatud", "Rida on edukalt kustutatud!")
         except sqlite3.Error as e:
             messagebox.showerror("Viga", f"Andmebaasi viga: {e}")
+            return
         finally:    
             if conn:
                 conn.commit()
                 conn.close()
+
+            load_data_from_db(tree, tree.table_name)
+            messagebox.showinfo("Edukalt kustutatud", "Rida on edukalt kustutatud!")
     else:
         messagebox.showwarning("Valik puudub", "Palun vali kõigepealt rida!")
     
 # --------------------------------------
+search_var = None
+
 def create_tree_buttons(root, tree):
-    search_frame = ctk.CTkFrame(root, height=80)
-    search_frame.pack(pady=(0, 20), padx=20, fill=ctk.X)
+    search_frame = ctk.CTkFrame(root, height=90)
+    search_frame.pack(pady=10, padx=10, fill=ctk.X)
     
     global search_entry
     search_entry = ctk.CTkEntry(search_frame, width=250)
     search_entry.pack(side=ctk.LEFT, padx=10)
 
-    search_button = ctk.CTkButton(search_frame, text="Otsi", command=lambda tree=tree: on_search(tree, "title"), width=50)
+    column_keys = list(tree.columns.keys())[1:]  # skip id
+    column_names = list(tree.columns.values())[1:] 
+
+    # name - key
+    col_name_key = dict(zip(column_names, column_keys))
+
+    global search_var
+    search_var = ctk.StringVar(value=column_names[0])
+
+    search_button = ctk.CTkButton(search_frame, text="Otsi", command=lambda tree=tree: on_search(tree, col_name_key[search_var.get()]), width=50)
     search_button.pack(side=ctk.LEFT)
     
     update_button = ctk.CTkButton(search_frame, text="Uuenda", command=lambda tree=tree: on_update(tree))
@@ -472,6 +536,13 @@ def create_tree_buttons(root, tree):
     
     delete_button = ctk.CTkButton(search_frame, text="Kustuta", command=lambda tree=tree: on_delete(tree))
     delete_button.pack(pady=5, padx=2, side=ctk.RIGHT)
+
+    select_search_sign = ctk.CTkOptionMenu(search_frame,
+        values=list(tree.columns.values())[1:],
+        variable=search_var,
+        width=150
+    )
+    select_search_sign.pack(side=ctk.LEFT, padx=5)
     
 def create_tree(parent, tbl_name: str, columns: dict):
     frame = ctk.CTkFrame(parent)
@@ -492,7 +563,7 @@ def create_tree(parent, tbl_name: str, columns: dict):
     tree.columns = columns
     tree.table_name = tbl_name
     
-    create_tree_buttons(window, tree)
+    create_tree_buttons(parent, tree)
     load_data_from_db(tree, tbl_name)
     
     return tree
