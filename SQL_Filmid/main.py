@@ -5,7 +5,6 @@
 import sqlite3
 import customtkinter as ctk
 from tkinter import messagebox, ttk
-import os
 
 # --------------------------------------
 
@@ -432,32 +431,86 @@ def open_table(tbl_name):
     create_tree(tbl_tree_frame, tbl_name, columns)
     
 # --------------------------------------
+record_window = None
+
 def open_record_window(root, tree, record_id):
+    global record_window
+    if record_window:
+        record_window.destroy()
+
     record_window = ctk.CTkToplevel(root)
     record_window.title("Tabel: " + tree.table_name.capitalize())
     record_window.resizable(width=False, height=False)
     
     columns = get_tbl_columns(tree.table_name)
+    foreign_keys = get_tbl_foreign_keys(tree.table_name)
     
     try:
         conn, cursor = connect_db()
 
-        record = cursor.execute(build_select_query(tree.table_name, f"id={record_id}", False))
-        record = cursor.fetchone()
-        
-        entries = {}
-        for i, label in enumerate(columns.keys()): 
-            frame = ctk.CTkFrame(record_window)
-            frame.pack(padx=10, pady=5, expand=True, side=ctk.TOP, fill=ctk.BOTH)
-                 
-            ctk.CTkLabel(frame, text=label, width=50, anchor="w").pack(padx=10, pady=1, fill=ctk.BOTH, side=ctk.LEFT) 
-                    
-            entry = ctk.CTkEntry(frame, width=300)
-            entry.pack(side=ctk.RIGHT, fill=ctk.BOTH)
-            entry.insert(0, record[i])
-            entries[label] = entry
+        if not record_id is None:
+            record = cursor.execute(build_select_query(tree.table_name, f"id={record_id}", False))
+            record = cursor.fetchone()
+        else:
+            record = [""] * len(columns)
 
-        load_data_from_db(tree, MOVIES)
+        entries = {}
+        for i, key in enumerate(columns.keys()): 
+            if not (record_id is None and key == "id"):
+                frame = ctk.CTkFrame(record_window)
+                frame.pack(padx=10, pady=5, expand=True, side=ctk.TOP, fill=ctk.BOTH)
+
+            if key == "id":
+                if record_id is None:
+                    continue
+
+                ctk.CTkLabel(frame, text=tree.columns[key]+":", width=20, anchor="w").pack(padx=10, pady=1, fill=ctk.BOTH, side=ctk.LEFT) 
+                ctk.CTkLabel(frame, text=record[i], anchor="w").pack(fill=ctk.BOTH, side=ctk.LEFT) 
+            else:
+                ctk.CTkLabel(frame, text=tree.columns[key], width=50, anchor="w").pack(padx=10, pady=1, fill=ctk.BOTH, side=ctk.LEFT) 
+
+                if key in foreign_keys:
+                    ref_table = foreign_keys[key].split("(")[0].strip()
+
+                    cursor.execute(f"SELECT id, name FROM {ref_table} ORDER BY name")
+                    options = [(-1, "Puudub")]
+                    options = options + cursor.fetchall()  # [(id, name), ...]
+
+                    names = []
+                    for opt in options:
+                        names.append(opt[1])
+
+                    combo = ctk.CTkComboBox(frame, values=names, width=300)
+                    combo.pack(side=ctk.RIGHT, fill=ctk.BOTH)
+
+                    current_id = record[i]
+                    selected_name = ""
+
+                    for id, name in options:
+                        if id == current_id:
+                            selected_name = name
+                            break
+                            
+                    if selected_name:
+                        combo.set(selected_name)
+                    else:
+                        combo.set(names[0])
+
+                    entries[key] = (combo, options)
+                else:
+                    entry = ctk.CTkEntry(frame, width=300)
+                    entry.pack(side=ctk.RIGHT, fill=ctk.BOTH)
+                    entry.insert(0, record[i])
+                    entries[key] = entry
+
+        text = "Salvesta"
+        if record_id is None:
+            text = "Lisa"
+
+        save_but = ctk.CTkButton(record_window, text=text, width=200)
+        save_but.configure(command=lambda: save_record(record_window, tree, record_id, entries))
+        save_but.pack(side=ctk.TOP, padx=10, pady=10)
+
     except sqlite3.Error as e:
         messagebox.showerror("Viga", f"Andmebaasi viga: {e}")
     finally:    
@@ -465,9 +518,83 @@ def open_record_window(root, tree, record_id):
             conn.commit()
             conn.close()
 
+def save_record(record_window, tree, record_id, entries):
+    isError = False
+
+    try:
+        conn, cursor = connect_db()
+        
+        columns = get_tbl_columns(tree.table_name)
+        values = []
+        for key, entry in entries.items():
+            if isinstance(entry, tuple):
+                options = entry[1]
+                for opt in options:
+                    if opt[1] == entry[0].get():
+                        value = opt[0]
+                        break
+            else:
+                value = entry.get()
+
+            if "NOT NULL" in columns[key]:
+                if not value.strip():
+                    messagebox.showerror("Viga", f"{tree.columns[key]} ei tohi olla tühi!")
+                    isError = True
+                    return
+                
+            if value and "INTEGER" in columns[key] and isinstance(value, str):
+                try:
+                    value = int(value)
+                except ValueError:
+                    messagebox.showerror("Viga", f"{tree.columns[key]} peab olema täisarv!")
+                    isError = True
+                    return
+            elif value and "REAL" in columns[key] and isinstance(value, str):
+                try:
+                    value = float(value)
+                except ValueError:
+                    messagebox.showerror("Viga", f"{tree.columns[key]} peab olema arv!")
+                    isError = True
+                    return
+
+            if not record_id is None:
+                if isinstance(value, str):
+                    value = f'"{value}"'
+
+                values.append(f"{key}={value}")
+            else:
+                values.append(value)
+
+        if record_id is None:
+            insert_into_table(cursor, tree.table_name, dict(zip(entries.keys(), values)))
+        else:
+            sets = ", ".join(values)
+            query = f"UPDATE {tree.table_name} SET {sets} WHERE id={record_id}"
+            cursor.execute(query)
+        
+    except sqlite3.Error as e:
+        messagebox.showerror("Viga", f"Andmebaasi viga: {e}")
+    finally:    
+        if not isError:
+            record_window.destroy()
+
+        if conn:
+            conn.commit()
+            conn.close()
+
+        if not isError:
+            load_data_from_db(tree, tree.table_name)
+            messagebox.showinfo("Edukalt uuendatud", "Rida on edukalt uuendatud!")
+
+# --------------------------------------
+def on_add(tree):
+    open_record_window(window, tree, None)
+
+# --------------------------------------
 def on_search(tree, row_name):
     load_data_from_db(tree, tree.table_name, row_name, search_entry.get())
     
+# --------------------------------------
 def on_update(tree):
     global window
     selected_items = tree.selection()
@@ -478,6 +605,7 @@ def on_update(tree):
     else:
         messagebox.showwarning("Valik puudub", "Palun vali kõigepealt rida!")
     
+# --------------------------------------
 def on_delete(tree):
     selected_items = tree.selection()
     
@@ -531,11 +659,14 @@ def create_tree_buttons(root, tree):
     search_button = ctk.CTkButton(search_frame, text="Otsi", command=lambda tree=tree: on_search(tree, col_name_key[search_var.get()]), width=50)
     search_button.pack(side=ctk.LEFT)
     
-    update_button = ctk.CTkButton(search_frame, text="Uuenda", command=lambda tree=tree: on_update(tree))
+    update_button = ctk.CTkButton(search_frame, text="Uuenda", command=lambda tree=tree: on_update(tree), width=100)
     update_button.pack(pady=5, padx=5, side=ctk.RIGHT)
     
-    delete_button = ctk.CTkButton(search_frame, text="Kustuta", command=lambda tree=tree: on_delete(tree))
+    delete_button = ctk.CTkButton(search_frame, text="Kustuta", command=lambda tree=tree: on_delete(tree), width=100)
     delete_button.pack(pady=5, padx=2, side=ctk.RIGHT)
+
+    add_button = ctk.CTkButton(search_frame, text="Lisa", command=lambda tree=tree: on_add(tree), width=100)
+    add_button.pack(pady=5, padx=2, side=ctk.RIGHT)
 
     select_search_sign = ctk.CTkOptionMenu(search_frame,
         values=list(tree.columns.values())[1:],
@@ -558,7 +689,7 @@ def create_tree(parent, tbl_name: str, columns: dict):
     
     for key, name in columns.items():
         tree.heading(key, text=name)
-        tree.column(key, width=100)
+        tree.column(key, width=(key == "id" and 30 or 100))
     
     tree.columns = columns
     tree.table_name = tbl_name
