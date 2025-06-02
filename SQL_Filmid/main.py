@@ -528,10 +528,12 @@ def save_record(record_window, tree, record_id, entries):
         values = []
         for key, entry in entries.items():
             if isinstance(entry, tuple):
-                options = entry[1]
+                options, combo = entry[1], entry[0]
+             
                 for opt in options:
-                    if opt[1] == entry[0].get():
-                        value = opt[0]
+                    name, id = opt[1], opt[0]
+                    if name == combo.get():
+                        value = id
                         break
             else:
                 value = entry.get()
