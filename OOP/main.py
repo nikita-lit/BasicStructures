@@ -6,6 +6,9 @@ class Product:
         self.price = price
         self.id = id
 
+    def __eq__(self, other):
+        return isinstance(other, Product) and other.id == self.id
+
 class Shop:
     def __init__(self, name):
         self.name = name
@@ -48,19 +51,34 @@ class Cart:
         if count_in_store < count:
             count = count_in_store
         self.shop.move_to_cart(product, count)
-        # self.products[product.id] = self.products.get(product.id, 0) + count
+        self.products[product.id] = self.products.get(product.id, 0) + count
         return count
+
+    def get_total_price(self):
+        total_price = 0
+        for pid, count in self.products.items():
+            total_price += self.shop.products[pid].price * count
+        return total_price
 
 if __name__ == "__main__":
     shop1 = Shop("Rama")
     shop2 = Shop("Selma")
 
     p1 = Product("Milk", 80)
+    p1a = Product("Milk", 80)
     p2 = Product("Bread", 120)
 
     shop1.add_product(p1, 10)
     shop1.add_product(p2, 10)
+    print(shop1.products)
 
     c1 = Cart(shop1)
-    print(c1.add_product(p1, 100))  # print 5
-    print(shop1.productscount)   # print 5
+    print(c1.add_product(p1, 100))
+    print(shop1.productscount) 
+    print(c1.products)
+    print(c1.add_product(p1a, 4))
+    print(shop1.product_counts)
+    print(c1.products)
+    c1.add_products(p2, 3)
+    print(c1.get_total_price)
+    print(p1 == p1a)
